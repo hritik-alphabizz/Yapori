@@ -79,7 +79,7 @@ class OtherUserProfileState extends State<OtherUserProfile> {
         Obx(() => _profileController.noDataFound.value == false
             ? Expanded(
                 child: ListView(
-                  padding: const EdgeInsets.only(top: 10),
+                  padding: const EdgeInsets.only(top: 0),
                   children: [
                     addProfileView(),
                     const SizedBox(height: 10),
@@ -88,39 +88,47 @@ class OtherUserProfileState extends State<OtherUserProfile> {
                     if (_settingsController.setting.value!.enableHighlights)
                       addHighlightsView(),
                     const SizedBox(height: 20),
-
-                    _profileController.user.value!.isPrivate! ?
-                    !_profileController.user.value!.isFollowing ?
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20.0),
-                      child: Row(
-                        children: [
-                         const  Icon(Icons.lock_outline_rounded, size: 30,),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-
-                               Heading5Text('This Account is Private'),
-                              BodyMediumText("Follow this account to see their posts and clips")
+                    _profileController.user.value!.isPrivate!
+                        ? !_profileController.user.value!.isFollowing
+                            ? Padding(
+                                padding: const EdgeInsets.only(left: 20.0),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.lock_outline_rounded,
+                                      size: 30,
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: const [
+                                        Heading5Text('This Account is Private'),
+                                        BodyMediumText(
+                                            "Follow this account to see their posts and clips")
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Column(
+                                children: [
+                                  segmentView(),
+                                  Obx(() => _profileController
+                                              .selectedSegment.value ==
+                                          1
+                                      ? addReelsGrid()
+                                      : addPhotoGrid()),
+                                ],
+                              )
+                        : Column(
+                            children: [
+                              segmentView(),
+                              Obx(() =>
+                                  _profileController.selectedSegment.value == 1
+                                      ? addReelsGrid()
+                                      : addPhotoGrid()),
                             ],
                           ),
-                        ],
-                      ),
-                    )
-                    : Column(
-                      children: [    segmentView(),
-                        Obx(() => _profileController.selectedSegment.value == 1
-                            ? addReelsGrid()
-                            : addPhotoGrid()
-                        ),],
-                    )
-               :  Column(
-                  children: [    segmentView(),
-                    Obx(() => _profileController.selectedSegment.value == 1
-                        ? addReelsGrid()
-                        : addPhotoGrid()
-                    ),],
-                ),
                     const SizedBox(height: 50),
                   ],
                 ),
@@ -134,7 +142,7 @@ class OtherUserProfileState extends State<OtherUserProfile> {
     return Positioned(
         left: 16,
         right: 16,
-        top: 40,
+        top: 45,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -193,10 +201,13 @@ class OtherUserProfileState extends State<OtherUserProfile> {
         builder: (ctx) {
           return _profileController.user.value != null
               ? Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Stack(
-                      children: [coverImage(), imageAndNameView(), appBar()],
+                    SizedBox(
+                      height: 310,
+                      child: Stack(
+                        children: [coverImage(), imageAndNameView(), appBar()],
+                      ),
                     ),
                     const SizedBox(
                       height: 20,
@@ -211,25 +222,31 @@ class OtherUserProfileState extends State<OtherUserProfile> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _profileController.user.value!.bio != null ?
-                          BodyMediumText(
-                              _profileController.user.value!.bio.toString(),
-                              weight: TextWeight.medium)
-                           : const SizedBox.shrink(),
-                          _profileController.user.value!.qualification != null || _profileController.user.value!.qualification != ''?
-                          BodyMediumText(
-                              _profileController.user.value!.qualification.toString(),
-                              weight: TextWeight.medium)
-                          : const SizedBox.shrink(),
-                          _profileController.user.value!.website != null || _profileController.user.value!.website != ''?
-                          BodyMediumText(
-                              _profileController.user.value!.website.toString(),
-                              weight: TextWeight.medium)
-                       : const SizedBox.shrink(),
+                          _profileController.user.value!.bio != null
+                              ? BodyMediumText(
+                                  _profileController.user.value!.bio.toString(),
+                                  weight: TextWeight.medium)
+                              : const SizedBox.shrink(),
+                          _profileController.user.value!.qualification !=
+                                      null ||
+                                  _profileController
+                                          .user.value!.qualification !=
+                                      ''
+                              ? BodyMediumText(
+                                  _profileController.user.value!.qualification
+                                      .toString(),
+                                  weight: TextWeight.medium)
+                              : const SizedBox.shrink(),
+                          _profileController.user.value!.website != null ||
+                                  _profileController.user.value!.website != ''
+                              ? BodyMediumText(
+                                  _profileController.user.value!.website
+                                      .toString(),
+                                  weight: TextWeight.medium)
+                              : const SizedBox.shrink(),
                         ],
                       ),
                     )
-
                   ],
                 )
               : Container();
@@ -261,7 +278,6 @@ class OtherUserProfileState extends State<OtherUserProfile> {
                 children: [
                   Heading6Text(_profileController.user.value!.userName,
                       weight: TextWeight.medium),
-
                   if (_profileController.user.value!.isVerified)
                     Row(
                       children: [
@@ -276,13 +292,13 @@ class OtherUserProfileState extends State<OtherUserProfile> {
                       ],
                     ),
                   BodyMediumText(
-                      _profileController.user.value!.gender == '0' ?
-                          ' '
-                      : _profileController.user.value!.gender == '1' ?
-                      ' , Male'
-                          : _profileController.user.value!.gender == '2' ?
-                      ' , Female'
-                          : ' , Other',
+                      _profileController.user.value!.gender == '0'
+                          ? ' '
+                          : _profileController.user.value!.gender == '1'
+                              ? ' , Male'
+                              : _profileController.user.value!.gender == '2'
+                                  ? ' , Female'
+                                  : ' , Other',
                       weight: TextWeight.medium),
                 ],
               ).bP4,
@@ -465,8 +481,8 @@ class OtherUserProfileState extends State<OtherUserProfile> {
                     highlights: _highlightsController.highlights,
                     addHighlightCallback: () {
                       Get.to(() => const ChooseStoryForHighlights(
-                        show: true,
-                      ));
+                            show: true,
+                          ));
                     },
                     viewHighlightCallback: (highlight) {
                       Get.to(() => HighlightViewer(highlight: highlight));
@@ -565,8 +581,7 @@ class OtherUserProfileState extends State<OtherUserProfile> {
                       Navigator.push(
                         context,
                         PageRouteBuilder(
-                          pageBuilder: (context, animation1,
-                              animation2) =>
+                          pageBuilder: (context, animation1, animation2) =>
                               PostMediaFullScreen(post: posts[index]),
                           transitionDuration: Duration.zero,
                           reverseTransitionDuration: Duration.zero,
