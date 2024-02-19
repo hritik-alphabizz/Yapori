@@ -74,7 +74,7 @@ class _ReplyAudioChatTileState extends State<ReplyAudioChatTile> {
                 Expanded(
                   child: SizedBox(
                     height: 20,
-                    child: AudioProgressBar(),
+                    child: AudioProgressBar(message: widget.message),
                   ),
                 ),
                 const SizedBox(

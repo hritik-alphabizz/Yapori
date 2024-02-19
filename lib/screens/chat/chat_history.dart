@@ -2,10 +2,10 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:foap/helper/imports/chat_imports.dart';
 import 'package:foap/helper/imports/common_import.dart';
 import 'package:foap/screens/chat/random_chat/choose_profile_category.dart';
+import 'package:foap/screens/chat/search_bar_without_margin.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../components/search_bar.dart';
-import '../../components/search_bar_without_margin.dart';
 import '../calling/call_history.dart';
 import '../settings_menu/settings_controller.dart';
 
@@ -123,14 +123,14 @@ class _ChatHistoryState extends State<ChatHistory> {
                 }),
                 Expanded(
                   child: Container(
-                    margin: const EdgeInsets.only(left: 10,right: 10),
+                    margin: const EdgeInsets.only(left: 10, right: 10),
                     height: 45,
                     decoration: BoxDecoration(
                         border: Border.all(
                           color: AppColorConstants.grayscale300,
                         ),
-                        borderRadius: const BorderRadius.all(Radius.circular(5))
-                    ),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(5))),
                     child: SearchBarWithoutMargin(
                       showSearchIcon: true,
                       hintText: LocalizationString.searchUserGroup,
@@ -145,19 +145,19 @@ class _ChatHistoryState extends State<ChatHistory> {
                     ),
                   ),
                 ),
-                settingsController.setting.value!.enableAudioCalling ?
-                    Container(
-                      height: 30,
-                      width: 30,
-                      color: AppColorConstants.themeColor,
-                      child: ThemeIconWidget(
-                        ThemeIcon.mobile,
-                        color: AppColorConstants.whiteClr,
-                      ),
-                    ).circular.ripple(() {
-                      Get.to(() => const CallHistory());
-                    }) : const SizedBox(),
-
+                settingsController.setting.value!.enableAudioCalling
+                    ? Container(
+                        height: 30,
+                        width: 30,
+                        color: AppColorConstants.themeColor,
+                        child: ThemeIconWidget(
+                          ThemeIcon.mobile,
+                          color: AppColorConstants.whiteClr,
+                        ),
+                      ).circular.ripple(() {
+                        Get.to(() => const CallHistory());
+                      })
+                    : const SizedBox(),
                 const SizedBox(width: 10),
               ],
             ),
@@ -243,7 +243,8 @@ class _ChatHistoryState extends State<ChatHistory> {
                     return Dismissible(
                       key: UniqueKey(),
                       onDismissed: (direction) {
-                        _chatController.deleteRoom(_chatController.searchedRooms[index]);
+                        _chatController
+                            .deleteRoom(_chatController.searchedRooms[index]);
                       },
                       background: Container(
                         color: AppColorConstants.red,
@@ -258,13 +259,14 @@ class _ChatHistoryState extends State<ChatHistory> {
                           ],
                         ).hP25,
                       ),
-                      child: ChatHistoryTile(model:
+                      child: ChatHistoryTile(
+                              model:
                                   //_chatController.allRooms[index]
                                   _chatController.searchedRooms[index])
                           .ripple(() {
                         ChatRoomModel model =
                             _chatController.searchedRooms[index];
-                            _chatController.clearUnreadCount(chatRoom: model);
+                        _chatController.clearUnreadCount(chatRoom: model);
 
                         Get.to(() => ChatDetail(chatRoom: model))!
                             .then((value) {

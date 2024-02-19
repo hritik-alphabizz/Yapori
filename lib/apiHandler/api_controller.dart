@@ -355,7 +355,7 @@ class ApiController {
     print("Bearer ${authKey!}");
 
     return await http.get(Uri.parse(url), headers: {
-      "Authorization": "Bearer ${authKey!}"
+      "Authorization": "Bearer $authKey"
     }).then((http.Response response) async {
       final ApiResponseModel parsedResponse =
           await getResponse(response.body, NetworkConstantsUtil.postDetail);

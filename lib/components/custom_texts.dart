@@ -23,6 +23,7 @@ class FontSizes {
 
   static double get b3 => 14 * scale;
 
+  static double get b3medium => 13 * scale;
 
 
   static double get b4 => 12 * scale;
@@ -233,9 +234,10 @@ class BodyLargeText extends StatelessWidget {
 
   final FontWeight? weight;
   final Color? color;
+  final double? fSize;
 
   const BodyLargeText(this.text,
-      {Key? key, this.textAlign, this.maxLines, this.weight, this.color})
+      {Key? key, this.textAlign, this.maxLines, this.weight, this.color, this.fSize})
       : super(key: key);
 
   @override
@@ -245,7 +247,7 @@ class BodyLargeText extends StatelessWidget {
         overflow: TextOverflow.clip,
         maxLines: maxLines,
         style: TextStyle(
-            fontSize: FontSizes.b2,
+            fontSize: fSize ?? FontSizes.b2,
             color: color ?? AppColorConstants.grayscale900,
             fontWeight: weight ?? TextWeight.medium));
   }
@@ -301,6 +303,7 @@ class BodySmallText extends StatelessWidget {
             fontWeight: weight ?? TextWeight.medium));
   }
 }
+
 
 class BodyExtraSmallText extends StatelessWidget {
   final String text;

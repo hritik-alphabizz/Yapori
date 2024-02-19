@@ -377,7 +377,8 @@ class LocalizationString {
   static String join = 'Join'.tr;
   static String fee = 'Fee'.tr;
   static String userNameIsUpdated = 'User name is updated'.tr;
-  static String categoryTypeUpdated = 'User profile category type is updated'.tr;
+  static String categoryTypeUpdated =
+      'User profile category type is updated'.tr;
 
   static String transaction = 'Transactions'.tr;
   static String phoneNumber = 'Phone number'.tr;
@@ -557,7 +558,6 @@ class LocalizationString {
   static String preview = "Preview".tr;
   static String seeAll = "See All".tr;
 
-
   static String suggestedClubs = "Suggested Clubs".tr;
   static String clubsYouMightInterested = "Clubs you might be interested in".tr;
   static String createClub = "Create club".tr;
@@ -622,8 +622,7 @@ class LocalizationString {
   static String pleaseAllowAccessToMicrophoneForAudioCall =
       'Please allow access to microphone to start audio call'.tr;
 
-  static String registeredSuccessFully =
-      'Registered successfully!'.tr;
+  static String registeredSuccessFully = 'Registered successfully!'.tr;
 
   static String star = 'Star'.tr;
   static String unStar = 'UnStar'.tr;
@@ -761,10 +760,8 @@ class LocalizationString {
   static String originalAudio = 'Original audio'.tr;
   static String use = 'Use'.tr;
 
-  static String anyoneCanSeeClub =
-      'Anyone can see & anyone can post'.tr;
-  static String onlyMembersCanSeeClub =
-      'Only admin can post'.tr;
+  static String anyoneCanSeeClub = 'Anyone can see & anyone can post'.tr;
+  static String onlyMembersCanSeeClub = 'Only admin can post'.tr;
   static String communication = 'Communication'.tr;
 
   static String chatGroup = 'Chat group'.tr;
@@ -1092,6 +1089,10 @@ class LocalizationString {
 
   // dating
   static String male = 'Male'.tr;
+
+  static String alert = 'Alert'.tr;
+  static String videoupload10mbMessage =
+      'Please upload a video of max 10mb.'.tr;
   static String female = 'Female'.tr;
   static String noSpecified = 'Not specified'.tr;
 
