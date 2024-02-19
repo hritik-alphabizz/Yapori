@@ -13,13 +13,15 @@ Widget messageTypeShortInfo({
           message: message, type: message.messageContentType);
 }
 
+//addon comment message typing status update
+
 Widget messageTypeShortInfoFromType({
   required ChatMessageModel message,
   required MessageContentType type,
 }) {
   return type == MessageContentType.text
       ? BodyMediumText(
-          message.textMessage,
+          message.isDeleted ? LocalizationString.thisMessageIsDeleted : message.textMessage,
           maxLines: 1,
         )
       : type == MessageContentType.photo

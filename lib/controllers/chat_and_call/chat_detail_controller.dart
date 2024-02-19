@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter_contacts/contact.dart';
 import 'package:foap/helper/imports/common_import.dart';
@@ -21,6 +22,7 @@ import '../../util/constant_util.dart';
 import '../../util/shared_prefs.dart';
 import '../agora_call_controller.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class ChatDetailController extends GetxController {
   final AgoraCallController agoraCallController = Get.find();
@@ -56,12 +58,17 @@ class ChatDetailController extends GetxController {
   bool canLoadMoreMessages = true;
   bool isLoading = false;
 
+  int? chatLastTimeOnline;
+  bool isFromStory = false;
+
+
   List<ChatMessageModel> get mediaMessages {
     return messages
         .where((element) =>
             element.messageContentType == MessageContentType.photo ||
             element.messageContentType == MessageContentType.video)
         .toList();
+
   }
 
   clear() {
@@ -131,6 +138,7 @@ class ChatDetailController extends GetxController {
   Future<UserModel?> getOpponentUser({required int userId}) async {
     UserModel? user;
     await ApiController().getOtherUser(userId.toString()).then((response) {
+      userAvailabilityStatusChange(isOnline: response.user!.isOnline, userId: response.user!.id);
       user = response.user;
     });
     return user;
@@ -142,13 +150,13 @@ class ChatDetailController extends GetxController {
       this.chatRoom.refresh();
     }
 
-    List<ChatMessageModel> msgList = await getIt<DBManager>().getAllMessages(
-        roomId: chatRoom.id, limit: 20, offset: messages.length);
+    List<ChatMessageModel> msgList = await getIt<DBManager>().getAllMessages(roomId: chatRoom.id, limit: 20, offset: messages.length);
     messages.insertAll(0, msgList);
 
+    log("messages "+jsonEncode(messages));
+
     if (chatRoom.isGroupChat == false) {
-      opponent.value =
-          await getOpponentUser(userId: chatRoom.opponent.userDetail.id);
+      opponent.value = await getOpponentUser(userId: chatRoom.opponent.userDetail.id);
     }
 
     if (msgList.length == 20) {
@@ -183,8 +191,7 @@ class ChatDetailController extends GetxController {
             // for (ChatMessageModel message in response.messages) {
             //   print('saving ${message.id}');
 
-            await getIt<DBManager>()
-                .saveMessage(chatMessages: response.messages);
+            await getIt<DBManager>().saveMessage(chatMessages: response.messages);
             // }
 
             if (chatRoom.id == this.chatRoom.value?.id) {
@@ -298,17 +305,24 @@ class ChatDetailController extends GetxController {
   }
 
   messageChanges() {
-    getIt<SocketManager>()
-        .emit(SocketConstants.typing, {'room': chatRoom.value!.id});
+    getIt<SocketManager>().emit(SocketConstants.typing, {'room': chatRoom.value!.id});
     messageTf.refresh();
     // update();
   }
 
+  //addon comment message status update
   sendMessageAsRead(ChatMessageModel message) {
     messages.value = messages.map((element) {
-      element.status = 3;
+      //addon comment
+      if(element.id == message.id)
+        {
+          element.status = 3;
+        }
+      //element.status = 3;
       return element;
     }).toList();
+
+    print("On read message event called :"+ jsonEncode(message));
 
     getIt<SocketManager>().emit(SocketConstants.readMessage,
         {'id': message.id, 'room': message.roomId});
@@ -376,6 +390,7 @@ class ChatDetailController extends GetxController {
     return status;
   }
 
+  //addon comment encrypt story message
   Future<bool> sendTextMessage(
       {required String messageText,
         required bool fromStory,
@@ -383,6 +398,8 @@ class ChatDetailController extends GetxController {
       required ChatRoomModel room}) async {
     print('working her !');
     bool status = true;
+
+    isFromStory = fromStory;
 
     final filter = ProfanityFilter();
     bool hasProfanity = filter.hasProfanity(messageText);
@@ -412,18 +429,17 @@ class ChatDetailController extends GetxController {
         'messageType': messageTypeId(mode == ChatMessageActionMode.reply
             ? MessageContentType.reply
             : MessageContentType.text),
-        'message': fromStory ? messageText.toString() : json.encode(content).encrypted(),
+        'message': /*fromStory ? messageText.toString().encrypted() :*/ json.encode(content).encrypted(),
         'replied_on_message': repliedOnMessage,
         'chat_version': AppConfigConstants.chatVersion,
         'room': room.id,
         'created_by': _userProfileManager.user.value!.id,
         'created_at': (DateTime.now().millisecondsSinceEpoch / 1000).round()
       };
-      print('this is chat message $message');
+      //print('this is chat message $message');
 
       //save message to socket server
-      status =
-          getIt<SocketManager>().emit(SocketConstants.sendMessage, message);
+      status = getIt<SocketManager>().emit(SocketConstants.sendMessage, message);
 
       ChatMessageModel currentMessageModel = ChatMessageModel();
       currentMessageModel.isEncrypted = AppConfigConstants.enableEncryption;
@@ -443,8 +459,7 @@ class ChatDetailController extends GetxController {
       currentMessageModel.messageContent = json.encode(content).encrypted();
       currentMessageModel.repliedOnMessageContent = repliedOnMessage;
 
-      currentMessageModel.createdAt =
-          (DateTime.now().millisecondsSinceEpoch / 1000).round();
+      currentMessageModel.createdAt = (DateTime.now().millisecondsSinceEpoch / 1000).round();
 
       addNewMessage(message: currentMessageModel, roomId: room.id);
       // save message to database
@@ -1157,8 +1172,7 @@ class ChatDetailController extends GetxController {
           };
 
           // send message to socket
-          status =
-              getIt<SocketManager>().emit(SocketConstants.sendMessage, message);
+          status = getIt<SocketManager>().emit(SocketConstants.sendMessage, message);
 
           // update in cache message
 
@@ -1173,8 +1187,8 @@ class ChatDetailController extends GetxController {
     return status;
   }
 
-  addNewMessage(
-      {required ChatMessageModel message, required int roomId}) async {
+  //addon comment when user on message details screen update message status
+  addNewMessage({required ChatMessageModel message, required int roomId}) async {
     if (roomId != message.roomId) {
       return;
     }
@@ -1190,6 +1204,14 @@ class ChatDetailController extends GetxController {
     }
 
     messages.add(message);
+
+    if(!message.isMineMessage && message.messageStatusType != MessageStatus.read && message.messageContentType != MessageContentType.groupAction && !message.isDateSeparator)
+    {
+      if(Get.currentRoute == "/ChatDetail")
+      {
+        sendMessageAsRead(message);
+      }
+    }
 
     // prepare smart reply suggestion messages
     if (message.messageContentType == MessageContentType.text &&
@@ -1338,8 +1360,7 @@ class ChatDetailController extends GetxController {
 
   deleteMessage({required int deleteScope}) async {
     // remove message in local database
-    await getIt<DBManager>()
-        .softDeleteMessages(messagesToDelete: selectedMessages);
+    await getIt<DBManager>().softDeleteMessages(messagesToDelete: selectedMessages);
 
     // remove saved media
     getIt<FileManager>().multipleDeleteMessageMedia(selectedMessages);
@@ -1351,14 +1372,6 @@ class ChatDetailController extends GetxController {
           .toList()
           .contains(element.localMessageId)) {
         element.isDeleted = true;
-
-        // print('element.chatMessageUser ${element.chatMessageUser.length}');
-        // ChatMessageUser user = element.chatMessageUser
-        //     .where((element) =>
-        //         element.userId == _userProfileManager.user.value!.id)
-        //     .first;
-        // //TODO : check deleted message status
-        // user.status == 4;
       } else {}
       return element;
     }).toList();
@@ -1383,31 +1396,42 @@ class ChatDetailController extends GetxController {
 
   //*************** updates from socket *******************//
 
-  messagedDeleted(
-      {required int messageId, required int roomId, required userId}) async {
+  //addon comment message delete status not updating related changes
+  messagedDeleted({required int messageId, required int roomId, required userId}) async {
     // update message in local cache
+
+    //else if(element.id == messageId)
+    //         {
+    //           element.isDeleted = true;
+    //         }
+    //update();
+
     if (chatRoom.value?.id == roomId) {
       messages.value = messages.map((element) {
-        if (selectedMessages
-            .map((element) => element.localMessageId)
-            .toList()
-            .contains(element.localMessageId)) {
+        if (selectedMessages.map((element) => element.localMessageId).toList().contains(element.localMessageId)) {
           element.isDeleted = true;
-        } else {}
+        }else if(element.id == messageId)
+        {
+          element.isDeleted = true;
+        }else {}
         return element;
       }).toList();
       messages.refresh();
+      update();
     }
 
     // delete media messages
-    List<ChatMessageModel> messagesList = await getIt<DBManager>()
-        .getMessagesById(messageId: messageId, roomId: roomId);
+    List<ChatMessageModel> messagesList = await getIt<DBManager>().getMessagesById(messageId: messageId, roomId: roomId);
 
     // remove saved media
     getIt<FileManager>().multipleDeleteMessageMedia(messagesList);
 
     // delete message in local database
-    getIt<DBManager>().softDeleteMessages(messagesToDelete: messagesList);
+    //addon comment added new method
+    //getIt<DBManager>().softDeleteMessages(messagesToDelete: messagesList);
+    getIt<DBManager>().softDeleteSingleMessages(messageId: messageId);
+
+
   }
 
   newMessageReceived(ChatMessageModel message) async {
@@ -1432,6 +1456,7 @@ class ChatDetailController extends GetxController {
     update();
   }
 
+  //addon comment
   messageUpdateReceived(Map<String, dynamic> updatedData) async {
     String? localMessageId = updatedData['localMessageId'];
     int roomId = updatedData['room'];
@@ -1440,8 +1465,7 @@ class ChatDetailController extends GetxController {
     int createdAt = updatedData['created_at'];
     if (localMessageId != null) {
       if (chatRoom.value?.id == roomId) {
-        var message =
-            messages.where((e) => e.localMessageId == localMessageId).first;
+        var message = messages.where((e) => e.localMessageId == localMessageId).first;
         message.id = messageId;
         message.status = status;
         message.createdAt = createdAt;
@@ -1449,9 +1473,6 @@ class ChatDetailController extends GetxController {
         if (message.messageContentType == MessageContentType.reply) {
           // message.reply.media = null;
         }
-        messages.refresh();
-
-        update();
       }
 
       await getIt<DBManager>().updateMessageStatus(
@@ -1460,6 +1481,7 @@ class ChatDetailController extends GetxController {
           id: messageId,
           status: status);
     }
+
     if (status == 1) {
       // add chat message user to message for first time, as here we received the message id
       List<ChatRoomMember> usersInRoom =
@@ -1474,8 +1496,31 @@ class ChatDetailController extends GetxController {
       }).toList();
       getIt<DBManager>().insertChatMessageUsers(users: chatMessageUsers);
     }
+
+    messages.refresh();
+    update();
+    updateMessageFromStory(roomId,localMessageId!,messageId,status,createdAt);
   }
 
+  //addon comment added new method for refresh messages when come from story
+  updateMessageFromStory(int roomId,String localMessageId,int messageId,int status,int createdAt)
+  async {
+    if(isFromStory)
+    {
+      await Future.delayed(const Duration(seconds: 3));
+      if (chatRoom.value?.id == roomId) {
+        var message = messages.where((e) => e.localMessageId == localMessageId).first;
+        message.id = messageId;
+        message.status = status;
+        message.createdAt = createdAt;
+
+        messages.refresh();
+        update();
+      }
+    }
+  }
+
+  //addon comment
   userTypingStatusChanged(
       {required String userName, required int roomId, required bool status}) {
     if (chatRoom.value?.id != roomId) {
@@ -1513,15 +1558,25 @@ class ChatDetailController extends GetxController {
     // }
   }
 
+  //addon comment user status online/offline dynamic update
   userAvailabilityStatusChange({required int userId, required bool isOnline}) {
     if (chatRoom.value != null) {
       if (chatRoom.value?.isGroupChat == false) {
         chatRoom.value!.roomMembers = chatRoom.value!.roomMembers.map((member) {
           if (member.userDetail.id == userId) {
-            member.userDetail.isOnline = true;
+            member.userDetail.isOnline = isOnline;
           }
           return member;
         }).toList();
+
+        //addon comment get offline status time
+        if(!isOnline)
+        {
+          chatLastTimeOnline = DateTime.now().millisecondsSinceEpoch;
+        }else
+        {
+          chatLastTimeOnline = null;
+        }
 
         chatRoom.refresh();
 
@@ -1536,6 +1591,16 @@ class ChatDetailController extends GetxController {
         // }
       }
     }
+  }
+
+  //addon comment status time from offline
+  String get lastSeenAtTime {
+    if (chatLastTimeOnline == null) {
+      return LocalizationString.offline;
+    }
+
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(chatLastTimeOnline! * 1000);
+    return '${LocalizationString.lastSeen} ${timeago.format(dateTime)}';
   }
 
   updatedChatGroupAccessStatus(

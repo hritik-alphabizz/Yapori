@@ -6,12 +6,15 @@ class ImageChatTile extends StatelessWidget {
 
   const ImageChatTile({Key? key, required this.message}) : super(key: key);
 
+  //addon comment design related changes
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         SizedBox(
-          height: 280,
+          height: MediaQuery.of(context).size.width * 0.65,
+          width: MediaQuery.of(context).size.width * 0.65,
           child: MessageImage(
             message: message,
             fitMode: BoxFit.cover,

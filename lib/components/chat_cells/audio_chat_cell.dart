@@ -14,6 +14,8 @@ class AudioChatTile extends StatefulWidget {
   State<AudioChatTile> createState() => _AudioChatTileState();
 }
 
+//addon comment changes size and color & single play audio
+
 class _AudioChatTileState extends State<AudioChatTile> {
   final PlayerManager _playerManager = Get.find();
 
@@ -40,18 +42,20 @@ class _AudioChatTileState extends State<AudioChatTile> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                //addon comment
+                //_playerManager.currentlyPlayingAudio.value?.id == widget.message.id.toString()
                 _playerManager.currentlyPlayingAudio.value?.id ==
-                        widget.message.id.toString()
+                        widget.message.localMessageId.toString()
                     ?  ThemeIconWidget(
                         ThemeIcon.stop,
-                        color: AppColorConstants.iconColor,
+                        color: widget.message.isMineMessage ? AppColorConstants.grayscale900 : AppColorConstants.whiteClr,
                         size: 30,
                       ).ripple(() {
                         stopAudio();
                       })
                     :  ThemeIconWidget(
                         ThemeIcon.play,
-                  color: AppColorConstants.iconColor,
+                        color: widget.message.isMineMessage ? AppColorConstants.grayscale900 : AppColorConstants.whiteClr,
                         size: 30,
                       ).ripple(() {
                         playAudio();
@@ -60,10 +64,11 @@ class _AudioChatTileState extends State<AudioChatTile> {
                   width: 15,
                 ),
                 SizedBox(
-                  width: 230,
+                  width: MediaQuery.of(context).size.width * 0.50,
                   height: 20,
-                  child: AudioProgressBar(),
+                  child: AudioProgressBar(message: widget.message),
                 ),
+                const SizedBox(width: 20)
               ],
             ),
             const SizedBox(
@@ -73,30 +78,36 @@ class _AudioChatTileState extends State<AudioChatTile> {
         ));
   }
 }
-
+//addon comment progress bar related changes
 class AudioProgressBar extends StatelessWidget {
+
+  final ChatMessageModel message;
+
   final PlayerManager _playerManager = Get.find();
 
-  AudioProgressBar({Key? key}) : super(key: key);
+  AudioProgressBar({Key? key, required this.message}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Obx(() => ProgressBar(
-          thumbColor: AppColorConstants.themeColor.darken(),
-          progressBarColor: AppColorConstants.themeColor,
-          baseBarColor: AppColorConstants.grayscale300,
-          thumbRadius: 8,
-          barHeight: 2,
-          progress: _playerManager.progress.value?.current ??
-              const Duration(seconds: 0),
-          // buffered: value.buffered,
-          total: _playerManager.progress.value?.total ??
-              const Duration(seconds: 0),
-          timeLabelPadding: 5,
-          timeLabelTextStyle: TextStyle(
-              fontSize: FontSizes.b4, fontWeight: TextWeight.bold)
+        thumbColor: message.isMineMessage ? AppColorConstants.themeColor.darken() : AppColorConstants.grayscale200,
+        progressBarColor: message.isMineMessage ? AppColorConstants.themeColor : AppColorConstants.grayscale400,
+        baseBarColor: message.isMineMessage ? AppColorConstants.grayscale300 : AppColorConstants.whiteClr,
+        thumbRadius: 8,
+        barHeight: 2,
+        //_playerManager.progress.value?.current ?? const Duration(seconds: 0)
+        progress: _playerManager.currentlyPlayingAudio.value?.id == message.localMessageId.toString() ? _playerManager.progress.value?.current ??
+            const Duration(seconds: 0) : const Duration(seconds: 0),
+        // buffered: value.buffered,
+        //_playerManager.progress.value?.total ?? const Duration(seconds: 0)
+        total: _playerManager.currentlyPlayingAudio.value?.id == message.localMessageId.toString() ? _playerManager.progress.value?.total ?? _playerManager.progress.value?.total ??
+            const Duration(seconds: 0) : const Duration(seconds: 0),
+        timeLabelPadding: 5,
+        timeLabelTextStyle: TextStyle(
+          //added color:message.isMineMessage ? AppColorConstants.grayscale900 : AppColorConstants.whiteClr
+            fontSize: FontSizes.b4, fontWeight: TextWeight.bold,color:message.isMineMessage ? AppColorConstants.grayscale900 : AppColorConstants.whiteClr)
 
-          // onSeek: pageManager.seek,
-        ));
+      // onSeek: pageManager.seek,
+    ),);
   }
 }

@@ -8,11 +8,13 @@ class VideoChatTile extends StatelessWidget {
   const VideoChatTile({Key? key, required this.message, this.showSmall})
       : super(key: key);
 
+  //addon comment design related changes
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 280,
-      // width: 280,
+      height: MediaQuery.of(context).size.width * 0.65,
+      width: MediaQuery.of(context).size.width * 0.65,
       child: Stack(
         children: [
           MessageImage(

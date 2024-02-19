@@ -144,6 +144,7 @@ class _ChatDetailState extends State<ChatDetail> {
     );
   }
 
+  //addon comment design related changes
   Widget appBar() {
     return Stack(
       alignment: AlignmentDirectional.center,
@@ -205,11 +206,7 @@ class _ChatDetailState extends State<ChatDetail> {
                               Row(
                                 children: [
                                   BodyLargeText(
-                                      _chatDetailController.chatRoom.value!
-                                                  .isGroupChat ==
-                                              true
-                                          ? _chatDetailController
-                                              .chatRoom.value!.name!
+                                      _chatDetailController.chatRoom.value!.isGroupChat == true ? _chatDetailController.chatRoom.value!.name!
                                           :
                                       _chatDetailController
                                           .chatRoom
@@ -221,7 +218,9 @@ class _ChatDetailState extends State<ChatDetail> {
                                               .opponent
                                               .userDetail
                                               .userName : '',
-                                      weight: TextWeight.bold),
+                                      weight: TextWeight.bold,
+                                      fSize: FontSizes.b3,
+                                      ),
                                   const SizedBox(width: 5),
                                   _chatDetailController
                                               .chatRoom.value!.isGroupChat ==
@@ -229,20 +228,17 @@ class _ChatDetailState extends State<ChatDetail> {
                                       ? Container(
                                           height: 8,
                                           width: 8,
-                                          // color: _chatDetailController
-                                          //             .chatRoom
-                                          //             .value!
-                                          //             .opponent
-                                          //             .userDetail
-                                          //             .isOnline ==
-                                          //         true
-                                          //     ? AppColorConstants.themeColor
-                                          //     :
-                                    color:AppColorConstants.disabledColor,
+                                           color: _chatDetailController
+                                                      .chatRoom
+                                                      .value!.opponent.userDetail.isOnline ==
+                                                 true
+                                              ? AppColorConstants.themeColor
+                                              : AppColorConstants.disabledColor,
                                         ).circular
                                       : Container(),
                                 ],
                               ),
+                              SizedBox(height: 3),
                               _chatDetailController
                                           .chatRoom.value!.isGroupChat ==
                                       false
@@ -256,20 +252,22 @@ class _ChatDetailState extends State<ChatDetail> {
                                           true
                                       ? BodyMediumText(
                                           LocalizationString.typing,
+                                          fSize: FontSizes.b5,
                                         )
                                       : BodyMediumText(
                                           _chatDetailController
                                                       .chatRoom
-                                                      .value!
-                                                      .opponent
-                                                      .userDetail
+                                                      .value!.opponent.userDetail
                                                       .isOnline ==
                                                   true
                                               ? LocalizationString.online
-                                              : _chatDetailController.opponent
-                                                      .value?.lastSeenAtTime ??
+                                              :
+                                          _chatDetailController.chatLastTimeOnline!=null ?
+                                          _chatDetailController.lastSeenAtTime :
+                                          _chatDetailController.opponent.value?.lastSeenAtTime ??
                                                   '',
-                                          weight: TextWeight.medium)
+                                          weight: TextWeight.medium,
+                                          fSize: FontSizes.b5,)
                                   : SizedBox(
                                       width: MediaQuery.of(context).size.width -
                                           120,
@@ -290,6 +288,7 @@ class _ChatDetailState extends State<ChatDetail> {
                                                 .join(','),
                                         maxLines: 1,
                                         textAlign: TextAlign.center,
+                                        fSize: FontSizes.b5,
                                       ),
                                     ),
                             ],
@@ -428,6 +427,7 @@ class _ChatDetailState extends State<ChatDetail> {
     );
   }
 
+  //addon comment design related changes
   Widget messageComposerView() {
     return Column(
       children: [
@@ -436,11 +436,11 @@ class _ChatDetailState extends State<ChatDetail> {
             : Container(),
         Container(
           color: AppColorConstants.backgroundColor.darken(0.02),
-          height: 70,
+          height: 75,
           child: Column(
             children: [
               const SizedBox(
-                height: 10,
+                height: 15,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -461,39 +461,53 @@ class _ChatDetailState extends State<ChatDetail> {
                           // chatDetailController
                           //     .expandCollapseActions();
                         }),
+                        const SizedBox(width: 10,),
                         Expanded(
                           child: SizedBox(
-                            height: 40,
-                            child: Obx(() => TextField(
-                                  textCapitalization: TextCapitalization.sentences,
-                                  controller:
-                                      _chatDetailController.messageTf.value,
-                                  textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                      fontSize: FontSizes.h5,
-                                      fontWeight: TextWeight.regular,
-                                      color: AppColorConstants.grayscale900),
-                                  maxLines: 50,
-                                  onChanged: (text) {
-                                    _chatDetailController.messageChanges();
-                                  },
-                                  decoration: InputDecoration(
-                                      floatingLabelBehavior:
-                                          FloatingLabelBehavior.never,
-                                      border: InputBorder.none,
-                                      contentPadding: const EdgeInsets.only(
-                                          left: 10, right: 10, top: 5),
-                                      labelStyle: TextStyle(
+                            height: 45,
+                            child: Obx(() => Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.only(top: 3,bottom: 2),
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: AppColorConstants.grayscale300,
+                                  ),
+                                  borderRadius: const BorderRadius.all(Radius.circular(5))
+                              ),
+                              child: SizedBox(
+                                height: 40,
+                                child: TextField(
+                                      textCapitalization: TextCapitalization.sentences,
+                                      controller:
+                                          _chatDetailController.messageTf.value,
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
                                           fontSize: FontSizes.b2,
-                                          fontWeight: TextWeight.medium,
-                                          color: AppColorConstants.themeColor),
-                                      hintStyle: TextStyle(
-                                          fontSize: FontSizes.h6,
                                           fontWeight: TextWeight.regular,
-                                          color: AppColorConstants.themeColor),
-                                      hintText: LocalizationString
-                                          .pleaseEnterMessage),
-                                )),
+                                          color: AppColorConstants.grayscale900),
+                                      maxLines: 50,
+                                      onChanged: (text) {
+                                        _chatDetailController.messageChanges();
+                                      },
+                                      decoration: InputDecoration(
+                                          floatingLabelBehavior:
+                                              FloatingLabelBehavior.never,
+                                          border: InputBorder.none,
+                                          contentPadding: const EdgeInsets.only(
+                                              left: 10, right: 10,top: 2,bottom : 2),
+                                          labelStyle: TextStyle(
+                                              fontSize: FontSizes.b2,
+                                              fontWeight: TextWeight.medium,
+                                              color: AppColorConstants.themeColor),
+                                          hintStyle: TextStyle(
+                                              fontSize: FontSizes.b2,
+                                              fontWeight: TextWeight.regular,
+                                              color: AppColorConstants.themeColor),
+                                          hintText: LocalizationString
+                                              .pleaseEnterMessage),
+                                    ),
+                              ),
+                            )),
                           ),
                         ),
                         const SizedBox(
@@ -530,7 +544,7 @@ class _ChatDetailState extends State<ChatDetail> {
                 ],
               ),
               const SizedBox(
-                height: 20,
+                height: 15,
               ),
             ],
           ).hP16,
@@ -575,14 +589,12 @@ class _ChatDetailState extends State<ChatDetail> {
                               top: 10, bottom: 50, left: 16, right: 16),
                           itemCount: _chatDetailController.messages.length,
                           itemBuilder: (ctx, index) {
-                            ChatMessageModel message =
-                                _chatDetailController.messages[index];
+                            ChatMessageModel message = _chatDetailController.messages[index];
 
                             ChatMessageModel? lastMessage;
 
                             if (index > 0) {
-                              lastMessage =
-                                  _chatDetailController.messages[index - 1];
+                              lastMessage = _chatDetailController.messages[index - 1];
                             }
 
                             String dateTimeStr = message.date;
@@ -609,7 +621,7 @@ class _ChatDetailState extends State<ChatDetail> {
                           },
                           separatorBuilder: (ctx, index) {
                             return const SizedBox(
-                              height: 20,
+                              height: 10,
                             );
                           })
                       .addPullToRefresh(
@@ -857,7 +869,6 @@ class _ChatDetailState extends State<ChatDetail> {
   }
 
   sendMessage() {
-    print('jhuvg');
     _chatDetailController.sendTextMessage(
         messageText: _chatDetailController.messageTf.value.text,
         fromStory: false,
@@ -933,8 +944,7 @@ class _ChatDetailState extends State<ChatDetail> {
         backgroundColor: Colors.transparent,
         context: context,
         isScrollControlled: true,
-        builder: (context) => const FractionallySizedBox(
-            heightFactor: 0.42, child: ChatMediaSharingOptionPopup()));
+        builder: (context) => ChatMediaSharingOptionPopup());
   }
 
   void deleteMessageActionPopup() {

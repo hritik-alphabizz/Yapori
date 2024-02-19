@@ -6,10 +6,13 @@ class StickerChatTile extends StatelessWidget {
 
   const StickerChatTile({Key? key, required this.message}) : super(key: key);
 
+  //addon comment design related changes
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        height: 150,
+        height: MediaQuery.of(context).size.width * 0.35,
+        width: MediaQuery.of(context).size.width * 0.35,
         child:
             // message.media == null
             //     ?

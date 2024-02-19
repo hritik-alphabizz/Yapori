@@ -1,13 +1,15 @@
+import 'dart:convert';
+
 import 'package:foap/helper/imports/chat_imports.dart';
 import 'package:foap/helper/imports/common_import.dart';
+import 'package:foap/helper/string_extension.dart';
 import 'package:get/get.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-class ChatMessageTile extends StatelessWidget {
+class ChatMessageTile extends StatefulWidget {
   final ChatMessageModel message;
   final bool showName;
   final bool actionMode;
-  final ChatDetailController chatDetailController = Get.find();
   final Function(ChatMessageModel) replyMessageTapHandler;
   final Function(ChatMessageModel) messageTapHandler;
 
@@ -21,25 +23,34 @@ class ChatMessageTile extends StatelessWidget {
       : super(key: key);
 
   @override
+  State<ChatMessageTile> createState() => _ChatMessageTileState();
+}
+
+class _ChatMessageTileState extends State<ChatMessageTile> {
+  final ChatDetailController chatDetailController = Get.find();
+
+  //addon comment design related changes
+
+  @override
   Widget build(BuildContext context) {
     return
-      message.messageContentType == MessageContentType.groupAction
+      widget.message.messageContentType == MessageContentType.groupAction
         ?
-      ChatGroupActionCell(message: message)
+      ChatGroupActionCell(message: widget.message)
         :
       Row(
             children: [
-              actionMode
+              widget.actionMode
                   ? Obx(() => Row(
                         children: [
                           ThemeIconWidget(
-                            chatDetailController.isSelected(message)
+                            chatDetailController.isSelected(widget.message)
                                 ? ThemeIcon.checkMarkWithCircle
                                 : ThemeIcon.circleOutline,
                             size: 20,
                             color: AppColorConstants.disabledColor,
                           ).ripple(() {
-                            chatDetailController.selectMessage(message);
+                            chatDetailController.selectMessage(widget.message);
                           }),
                           const SizedBox(
                             width: 10,
@@ -47,22 +58,26 @@ class ChatMessageTile extends StatelessWidget {
                         ],
                       ))
                   : Container(),
-              // message.isMineMessage ? const Spacer() : Container(),
               Expanded(
-                child: Container(
-                  color: message.messageContentType == MessageContentType.gif ||
-                          message.messageContentType ==
-                              MessageContentType.sticker
-                      ? Colors.transparent
-                      : message.isMineMessage
-                          ? AppColorConstants.backgroundColor
-                          : AppColorConstants.themeColor.darken(0.05),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      showName ? nameWidget(context) : Container(),
-                      message.messageContentType == MessageContentType.forward
-                          ? Row(
+                child: Row(
+                  mainAxisAlignment: widget.message.isMineMessage ? MainAxisAlignment.end : MainAxisAlignment.start,
+                  children: [
+                    IntrinsicWidth(
+                      child: Container(
+                        constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width * 0.23,maxWidth: MediaQuery.of(context).size.width * 0.75),
+                        color: widget.message.messageContentType == MessageContentType.gif ||
+                            widget.message.messageContentType ==
+                                MessageContentType.sticker
+                            ? Colors.transparent
+                            : widget.message.isMineMessage
+                            ? AppColorConstants.backgroundColor
+                            : AppColorConstants.themeColor.darken(0.05),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            widget.showName ? nameWidget(context) : Container(),
+                            widget.message.messageContentType == MessageContentType.forward
+                                ? Row(
                               children: [
                                 ThemeIconWidget(
                                   ThemeIcon.fwd,
@@ -74,84 +89,85 @@ class ChatMessageTile extends StatelessWidget {
                                 ),
                               ],
                             )
-                          : Container(),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      message.isDeleted == true
-                          ? deletedMessageWidget()
-                          : message.isReply
-                              ? replyContentWidget()
-                              : contentWidget(message).ripple(() {
-                                  messageTapHandler(message);
-                                }),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      MessageDeliveryStatusView(message: message),
-                    ],
-                  ).p8,
-                ).round(10).setPadding(
-                    left: message.isMineMessage ? 50 : 0,
-                    right: message.isMineMessage ? 0 : 50),
-              ),
+                                : Container(),
+                            const SizedBox(
+                              height: 2,
+                            ),
+                            widget.message.isDeleted == true
+                                ? deletedMessageWidget()
+                                : widget.message.isReply
+                                ? replyContentWidget()
+                                : contentWidget(widget.message).ripple(() {
+                              widget.messageTapHandler(widget.message);
+                            }),
+                            const SizedBox(
+                              height: 1,
+                            ),
+                            MessageDeliveryStatusView(message: widget.message),
+                          ],
+                        ).p8,
+                      ).round(10),
+                    ),
+                  ],
+                ),
+              )
               // message.isMineMessage ? Container() : const Spacer(),
             ],
           );
   }
 
   Widget deletedMessageWidget() {
-    return DeletedMessageChatTile(message: message);
+    return DeletedMessageChatTile(message: widget.message);
   }
 
   Widget replyContentWidget() {
-    if (message.messageReplyContentType == MessageContentType.text) {
+    if (widget.message.messageReplyContentType == MessageContentType.text) {
       return ReplyTextChatTile(
-        message: message,
-        messageTapHandler: messageTapHandler,
-        replyMessageTapHandler: replyMessageTapHandler,
+        message: widget.message,
+        messageTapHandler: widget.messageTapHandler,
+        replyMessageTapHandler: widget.replyMessageTapHandler,
       );
-    } else if (message.messageReplyContentType == MessageContentType.photo) {
+    } else if (widget.message.messageReplyContentType == MessageContentType.photo) {
       return ReplyImageChatTile(
-          message: message,
-          messageTapHandler: messageTapHandler,
-          replyMessageTapHandler: replyMessageTapHandler);
-    } else if (message.messageReplyContentType == MessageContentType.gif) {
+          message: widget.message,
+          messageTapHandler: widget.messageTapHandler,
+          replyMessageTapHandler: widget.replyMessageTapHandler);
+    } else if (widget.message.messageReplyContentType == MessageContentType.gif) {
       return ReplyStickerChatTile(
-          message: message,
-          messageTapHandler: messageTapHandler,
-          replyMessageTapHandler: replyMessageTapHandler);
-    } else if (message.messageReplyContentType == MessageContentType.video) {
+          message: widget.message,
+          messageTapHandler: widget.messageTapHandler,
+          replyMessageTapHandler: widget.replyMessageTapHandler);
+    } else if (widget.message.messageReplyContentType == MessageContentType.video) {
       return ReplyVideoChatTile(
-          message: message,
-          messageTapHandler: messageTapHandler,
-          replyMessageTapHandler: replyMessageTapHandler);
-    } else if (message.messageReplyContentType == MessageContentType.audio) {
+          message: widget.message,
+          messageTapHandler: widget.messageTapHandler,
+          replyMessageTapHandler: widget.replyMessageTapHandler);
+    } else if (widget.message.messageReplyContentType == MessageContentType.audio) {
       return ReplyAudioChatTile(
-          message: message, replyMessageTapHandler: replyMessageTapHandler);
-    } else if (message.messageReplyContentType == MessageContentType.contact) {
+          message: widget.message, replyMessageTapHandler: widget.replyMessageTapHandler);
+    } else if (widget.message.messageReplyContentType == MessageContentType.contact) {
       return ReplyContactChatTile(
-          message: message,
-          messageTapHandler: messageTapHandler,
-          replyMessageTapHandler: replyMessageTapHandler);
-    } else if (message.messageReplyContentType ==
+          message: widget.message,
+          messageTapHandler: widget.messageTapHandler,
+          replyMessageTapHandler: widget.replyMessageTapHandler);
+    } else if (widget.message.messageReplyContentType ==
         MessageContentType.location) {
       return ReplyLocationChatTile(
-          message: message,
-          messageTapHandler: messageTapHandler,
-          replyMessageTapHandler: replyMessageTapHandler);
-    } else if (message.messageReplyContentType == MessageContentType.profile) {
+          message: widget.message,
+          messageTapHandler: widget.messageTapHandler,
+          replyMessageTapHandler: widget.replyMessageTapHandler);
+    } else if (widget.message.messageReplyContentType == MessageContentType.profile) {
       return ReplyUserProfileChatTile(
-          message: message,
-          messageTapHandler: messageTapHandler,
-          replyMessageTapHandler: replyMessageTapHandler);
-    } else if (message.messageReplyContentType == MessageContentType.file) {
+          message: widget.message,
+          messageTapHandler: widget.messageTapHandler,
+          replyMessageTapHandler: widget.replyMessageTapHandler);
+    } else if (widget.message.messageReplyContentType == MessageContentType.file) {
       return ReplyFileChatTile(
-          message: message,
-          messageTapHandler: messageTapHandler,
-          replyMessageTapHandler: replyMessageTapHandler);
+          message: widget.message,
+          messageTapHandler: widget.messageTapHandler,
+          replyMessageTapHandler: widget.replyMessageTapHandler);
     }
-    return TextChatTile(message: message);
+    return TextChatTile(message: widget.message);
   }
 
   Widget contentWidget(ChatMessageModel messageModel) {
@@ -178,25 +194,31 @@ class ChatMessageTile extends StatelessWidget {
     } else if (messageModel.messageContentType == MessageContentType.file) {
       return FileChatTile(message: messageModel);
     }
-    return TextChatTile(message: message);
+    return TextChatTile(message: widget.message);
   }
 
   Widget nameWidget(BuildContext context) {
     return BodyLargeText(
-      message.isMineMessage ? LocalizationString.you : message.sender!.userName,
+      widget.message.isMineMessage ? LocalizationString.you : widget.message.sender!.userName,
       weight: TextWeight.bold,
+      fSize: FontSizes.b3,
         // color: Colors.red,
 
     );
   }
 }
 
-class MessageDeliveryStatusView extends StatelessWidget {
+class MessageDeliveryStatusView extends StatefulWidget {
   final ChatMessageModel message;
 
   const MessageDeliveryStatusView({Key? key, required this.message})
       : super(key: key);
 
+  @override
+  State<MessageDeliveryStatusView> createState() => _MessageDeliveryStatusViewState();
+}
+
+class _MessageDeliveryStatusViewState extends State<MessageDeliveryStatusView> {
   @override
   Widget build(BuildContext context) {
     final ChatDetailController chatDetailController = Get.find();
@@ -206,45 +228,53 @@ class MessageDeliveryStatusView extends StatelessWidget {
         onVisibilityChanged: (visibilityInfo) {
           var visiblePercentage = visibilityInfo.visibleFraction * 100;
 
-          if (!message.isMineMessage && visiblePercentage > 90) {
-            if (message.messageStatusType != MessageStatus.read &&
-                message.messageContentType != MessageContentType.groupAction &&
-                !message.isDateSeparator) {
-              chatDetailController.sendMessageAsRead(message);
-              message.status = 3;
+          //addon comment
+
+          /*if (!widget.message.isMineMessage && widget.message.messageStatusType != MessageStatus.read && widget.message.messageContentType != MessageContentType.groupAction) {
+            print("called    ${widget.message.textMessage}");
+            chatDetailController.sendMessageAsRead(widget.message);
+            widget.message.status = 3;
+          }*/
+          if (!widget.message.isMineMessage && visiblePercentage > 90) {
+            if (widget.message.messageStatusType != MessageStatus.read && widget.message.messageContentType != MessageContentType.groupAction && !widget.message.isDateSeparator) {
+              chatDetailController.sendMessageAsRead(widget.message);
+              widget.message.status = 3;
             }
           }
+
+
+
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            message.isStar == 1
+            widget.message.isStar == 1
                 ? ThemeIconWidget(
                     ThemeIcon.filledStar,
                     color: AppColorConstants.themeColor,
                     size: 15,
                   ).rP4
                 : Container(),
-            BodySmallText(
-              message.messageTime,
+            BodyExtraSmallText(
+              widget.message.messageTime,
               weight:TextWeight.medium,
-              color: message.isMineMessage ?   AppColorConstants.iconColor : AppColorConstants.whiteClr ,
+              color: widget.message.isMineMessage ?   AppColorConstants.iconColor : AppColorConstants.whiteClr ,
             ),
             const SizedBox(
               width: 5,
             ),
-            message.isMineMessage
+            widget.message.isMineMessage
                 ? ThemeIconWidget(
-                    message.messageStatusType == MessageStatus.sent
+                    widget.message.messageStatusType == MessageStatus.sent
                         ? ThemeIcon.sent
-                        : message.messageStatusType == MessageStatus.delivered
+                        : widget.message.messageStatusType == MessageStatus.delivered
                             ? ThemeIcon.delivered
-                            : message.messageStatusType == MessageStatus.read
+                            : widget.message.messageStatusType == MessageStatus.read
                                 ? ThemeIcon.read
                                 : ThemeIcon.sending,
                     size: 15,
-                    color: message.messageStatusType == MessageStatus.read
+                    color: widget.message.messageStatusType == MessageStatus.read
                         ? Colors.blue
                         : AppColorConstants.iconColor,
                   )

@@ -6,12 +6,14 @@ class LocationChatTile extends StatelessWidget {
   final ChatMessageModel message;
   const LocationChatTile({Key? key, required this.message}) : super(key: key);
 
+  //addon comment design related changes
+
   @override
   Widget build(BuildContext context) {
     var controller = StaticMapController(
       googleApiKey: AppConfigConstants.googleMapApiKey,
-      width: 400,
-      height: 400,
+      height: (MediaQuery.of(context).size.width * 0.65).toInt(),
+      width: (MediaQuery.of(context).size.width * 0.65).toInt(),
       zoom: 15,
       center: Location(message.mediaContent.location!.latitude,
           message.mediaContent.location!.longitude),

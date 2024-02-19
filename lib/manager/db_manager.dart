@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -21,6 +22,7 @@ class DBManager {
   late Database database;
   var random = math.Random.secure();
 
+  //wrong table create time wrong data type added
   createDatabase() async {
     var databasesPath = await getDatabasesPath();
     var path = p.join(databasesPath, 'socialified.db');
@@ -33,7 +35,9 @@ class DBManager {
             await db.execute(
                 'CREATE TABLE StoryViewHistory (storyId INTEGER PRIMARY KEY, time INTEGER)');
             await db.execute(
-                'CREATE TABLE ChatRooms (id INTEGER PRIMARY KEY, title TEXT ,status INTEGER,type INTEGER,is_chat_user_online INTEGER, created_by INTEGER,created_at INTEGER,updated_at INTEGER,imageUrl TEXT,description TEXT,chat_access_group INTEGER,last_message_id TEXT,unread_messages_count INTEGER)');
+              //addon comment change
+              'CREATE TABLE ChatRooms (id INTEGER PRIMARY KEY, title TEXT ,status INTEGER,type INTEGER,is_chat_user_online INTEGER, created_by INTEGER,created_at INTEGER,updated_at INTEGER,imageUrl TEXT,description TEXT,chat_access_group INTEGER,last_message_id TEXT,unread_messages_count INTEGER)');
+               // 'CREATE TABLE ChatRooms (id INTEGER PRIMARY KEY, title TEXT ,status INTEGER,type INTEGER,is_chat_user_online BOOLEAN, created_by INTEGER,created_at INTEGER,updated_at INTEGER,imageUrl TEXT,description TEXT,chat_access_group INTEGER,last_message_id TEXT,unread_messages_count INTEGER)');
             await db.execute(
                 'CREATE TABLE Messages (local_message_id TEXT PRIMARY KEY, id INTEGER, room_id INTEGER,messageType INTEGER, message TEXT,username TEXT, created_by INTEGER,created_at INTEGER,viewed_at INTEGER,isDeleted INTEGER,isStar INTEGER,deleteAfter INTEGER,is_encrypted INTEGER,chat_version INTEGER,current_status INTEGER,encryption_key TEXT,replied_on_message TEXT)');
             await db.execute(
@@ -110,10 +114,9 @@ class DBManager {
   // }
 
   newMessageReceived(ChatMessageModel message) async {
-    ChatRoomModel? existingRoom =
-        await getIt<DBManager>().getRoomById(message.roomId);
+    ChatRoomModel? existingRoom = await getIt<DBManager>().getRoomById(message.roomId);
     print('newMessageReceived');
-    print('existingRoom = $existingRoom');
+    print('new message = ${jsonEncode(message)}');
 
     if (existingRoom == null) {
       // save room in database
@@ -141,7 +144,7 @@ class DBManager {
       ChatRoomModel? room = await getRoomById(chatRoom.id);
       if (room == null) {
         batch.rawInsert(
-            'INSERT INTO ChatRooms(id, title, status,type,is_chat_user_online,created_by,created_at,updated_at,imageUrl,description,chat_access_group) VALUES(${chatRoom.id},"${chatRoom.name}", ${chatRoom.status},${chatRoom.type}, ${chatRoom.isOnline},${chatRoom.createdBy},${chatRoom.createdAt},${chatRoom.createdAt},"${chatRoom.image}","${chatRoom.description}",${chatRoom.groupAccess})');
+            'INSERT INTO ChatRooms(id, title, status,type,is_chat_user_online,created_by,created_at,updated_at,imageUrl,description,chat_access_group) VALUES(${chatRoom.id},"${chatRoom.name}", ${chatRoom.status},${chatRoom.type}, ${chatRoom.isOnline ? 1 : 0},${chatRoom.createdBy},${chatRoom.createdAt},${chatRoom.createdAt},"${chatRoom.image}","${chatRoom.description}",${chatRoom.groupAccess})');
 
         for (ChatRoomMember member in chatRoom.roomMembers) {
           batch.rawDelete(
@@ -171,18 +174,20 @@ class DBManager {
     await batch.commit(noResult: true);
   }
 
+  //addon comment database wrong value update changes
   Future updateRoom(ChatRoomModel chatRoom) async {
     // ChatRoomModel? room = await getRoomById(chatRoom.id);
     ChatMessageModel? lastMessage = chatRoom.lastMessage;
     int? updateAt = chatRoom.updatedAt ?? DateTime.now().millisecondsSinceEpoch;
     var batch = database.batch();
-
     // await database.transaction((txn) async {
+
     batch.rawUpdate('UPDATE ChatRooms '
         'SET title = "${chatRoom.name}",'
         'status = ${chatRoom.status},'
         'type = ${chatRoom.type},'
-        'is_chat_user_online = ${chatRoom.isOnline},'
+        //'is_chat_user_online = ${chatRoom.isOnline},'
+        'is_chat_user_online = ${chatRoom.isOnline ? 1 : 0},'
         'updated_at = $updateAt,'
         'imageUrl = "${chatRoom.image}",'
         'description = "${chatRoom.description}",'
@@ -344,8 +349,7 @@ class DBManager {
           List<ChatRoomMember> usersInRoom =
               await fetchAllMembersInRoom(room.id, txn);
 
-          List<ChatMessageModel> lastMessages =
-              await getLastMessageFromRoom(roomId: room.id, txn: txn);
+          List<ChatMessageModel> lastMessages = await getLastMessageFromRoom(roomId: room.id, txn: txn);
           if (lastMessages.isNotEmpty) {
             room.lastMessage = lastMessages.first;
           }
@@ -717,7 +721,8 @@ class DBManager {
     await batch.commit(noResult: true);
   }
 
-  softDeleteMessages({required List<ChatMessageModel> messagesToDelete}) async {
+  //addon comment
+  /*softDeleteMessages({required List<ChatMessageModel> messagesToDelete}) async {
     var batch = database.batch();
 
     for (ChatMessageModel message in messagesToDelete) {
@@ -731,6 +736,31 @@ class DBManager {
       //     localMessageId: message.localMessageId,
       //     content: message.messageContent);
     }
+  }*/
+
+  //addon comment method update not working related changes
+  softDeleteMessages({required List<ChatMessageModel> messagesToDelete}) async {
+
+    for (ChatMessageModel message in messagesToDelete) {
+      await database.transaction((txn) async {
+        await txn.rawUpdate('UPDATE Messages '
+            'SET '
+            'isDeleted = 1 '
+            'WHERE local_message_id = "${message.localMessageId}"');
+      });
+    }
+  }
+
+
+  //addon comment new method add because of old method not working properly
+  softDeleteSingleMessages({required int messageId}) async {
+
+    await database.transaction((txn) async {
+      await txn.rawUpdate('UPDATE Messages '
+          'SET '
+          'isDeleted = 1 '
+          'WHERE id = "$messageId"');
+    });
   }
 
   updateUnReadCount({required int roomId}) async {

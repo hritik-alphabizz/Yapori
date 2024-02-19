@@ -9,11 +9,13 @@ class PostChatTile extends StatelessWidget {
 
   const PostChatTile({Key? key, required this.message}) : super(key: key);
 
+  //addon comment design related changes
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        height: 350,
-        width: double.infinity,
+        height: MediaQuery.of(context).size.width * 0.65,
+        width: MediaQuery.of(context).size.width * 0.65,
         child: Container(
           color: message.isMineMessage
               ? AppColorConstants.disabledColor

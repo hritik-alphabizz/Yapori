@@ -10,6 +10,8 @@ class TextChatTile extends StatelessWidget {
 
   const TextChatTile({Key? key, required this.message}) : super(key: key);
 
+  //addon comment design related changes
+
   @override
   Widget build(BuildContext context) {
     String messageString = message.textMessage;
@@ -27,7 +29,7 @@ class TextChatTile extends StatelessWidget {
               //   errorBody: messageString,
               // ),
               const SizedBox(
-                height: 10,
+                height: 5,
               ),
               Linkify(
                 onOpen: (link) async {
@@ -39,7 +41,7 @@ class TextChatTile extends StatelessWidget {
                 },
                 text: messageString,
                 style: TextStyle(
-                    fontSize: FontSizes.b2,
+                    fontSize: FontSizes.b3,
                     color: AppColorConstants.grayscale900),
               )
             ],
@@ -53,7 +55,7 @@ class TextChatTile extends StatelessWidget {
               }
             },
             text: messageString,
-            style: TextStyle(fontSize: FontSizes.b2,color: message.isMineMessage  ? AppColorConstants.grayscale900 : AppColorConstants.whiteClr),
+            style: TextStyle(fontSize: FontSizes.b3,color: message.isMineMessage  ? AppColorConstants.grayscale900 : AppColorConstants.whiteClr),
           );
   }
 }

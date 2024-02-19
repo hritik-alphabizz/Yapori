@@ -3,13 +3,12 @@ import 'package:foap/helper/imports/common_import.dart';
 
 bool isDarkMode = true;
 
+//addon comment for random string with time stamp(only random string may be same)
 String randomId() {
-  const chars =
-      'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+  const chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
   Random rnd = Random();
 
-  return String.fromCharCodes(Iterable.generate(
-      25, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))));
+  return String.fromCharCodes(Iterable.generate(25, (_) => chars.codeUnitAt(rnd.nextInt(chars.length)))) + DateTime.now().millisecondsSinceEpoch.toString();
 }
 
 int messageTypeId(MessageContentType type) {

@@ -4,8 +4,8 @@ import 'package:foap/helper/imports/common_import.dart';
 import 'package:foap/screens/chat/random_chat/choose_profile_category.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-
 import '../../components/search_bar.dart';
+import '../../components/search_bar_without_margin.dart';
 import '../calling/call_history.dart';
 import '../settings_menu/settings_controller.dart';
 
@@ -29,7 +29,8 @@ class _ChatHistoryState extends State<ChatHistory> {
     super.initState();
     _chatController.getChatRooms();
     _bannerAd = BannerAd(
-      adUnitId: settingsController.setting.value!.interstitialAdUnitIdForAndroid!,
+      adUnitId:
+          settingsController.setting.value!.interstitialAdUnitIdForAndroid!,
       // adUnitId: 'ca-app-pub-3940256099942544/6300978111',
       request: const AdRequest(),
       size: AdSize.banner,
@@ -58,167 +59,175 @@ class _ChatHistoryState extends State<ChatHistory> {
     _bannerAd?.dispose();
     super.dispose();
   }
-  Widget bannerAd(){
+
+  Widget bannerAd() {
     return _bannerReady
         ? SizedBox(
-      width: MediaQuery.of(context).size.width ,
-      height: _bannerAd!.size.height.toDouble(),
-      child: AdWidget(ad: _bannerAd!),
-    )
+            width: MediaQuery.of(context).size.width,
+            height: _bannerAd!.size.height.toDouble(),
+            child: AdWidget(ad: _bannerAd!),
+          )
         : Container();
   }
+
+  //addon comment changes on app top bar design and add new class SearchBarWithoutMargin
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColorConstants.backgroundColor,
-      floatingActionButton: Container(
-        height: 50,
-        width: 50,
-        color: AppColorConstants.themeColor.withOpacity(0.7),
-        child:  ThemeIconWidget(
-          ThemeIcon.edit,
-          color: AppColorConstants.whiteClr,
-          size: 25,
-        ),
-      ).circular.ripple(() {
-        selectUsers();
-      }).bP16,
       body: KeyboardDismissOnTap(
-          child: Column(
-        children: [
-
-          const SizedBox(
-            height: 20,
-          ),
-          // (_settingsController.setting.value!.enableAudioCalling ||
-          //         _settingsController.setting.value!.enableVideoCalling)
-          //     ? titleNavigationBarWithIcon(
-          //         context: context,
-          //         title: LocalizationString.chats,
-          //         icon: ThemeIcon.mobile,
-          //         icon1: ThemeIcon.search,
-          //     isLeading: true,
-          //         completion: () {
-          //           Get.to(() => const CallHistory());
-          //         },
-          //     leading: (){
-          //           setState(() {
-          //             showSearchBar = !showSearchBar;
-          //           });
-          //     })
-          //     : titleNavigationBar(
-          //         context: context,
-          //         title: LocalizationString.chats,
-          //       ),
-          divider(context: context).tP8,
-          // showSearchBar ?
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width *0.90,
-                child: SearchBar(
-                        showSearchIcon: true,
-                        hintText: LocalizationString.searchUserGroup,
-                        iconColor: AppColorConstants.themeColor,
-                        onSearchChanged: (value) {
-                          _chatController.searchTextChanged(value);
-                        },
-                        onSearchStarted: () {
-                          //controller.startSearch();
-                        },
-                        onSearchCompleted: (searchTerm) {})
-                    .p16,
-              ),
-              if (settingsController.setting.value!.enableAudioCalling)
-              ThemeIconWidget(
-                ThemeIcon.mobile,
-                color: AppColorConstants.iconColor,
-                size: 25,
-              ).ripple(() {
-                Get.to(() => const CallHistory());
-              }),
-            ],
-          ),
-          // : const SizedBox.shrink(),
-          bannerAd(),
-          SizedBox(
-            height: 40,
-            child: Row(
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 20,
+            ),
+            // (_settingsController.setting.value!.enableAudioCalling ||
+            //         _settingsController.setting.value!.enableVideoCalling)
+            //     ? titleNavigationBarWithIcon(
+            //         context: context,
+            //         title: LocalizationString.chats,
+            //         icon: ThemeIcon.mobile,
+            //         icon1: ThemeIcon.search,
+            //     isLeading: true,
+            //         completion: () {
+            //           Get.to(() => const CallHistory());
+            //         },
+            //     leading: (){
+            //           setState(() {
+            //             showSearchBar = !showSearchBar;
+            //           });
+            //     })
+            //     : titleNavigationBar(
+            //         context: context,
+            //         title: LocalizationString.chats,
+            //       ),
+            divider(context: context).tP8,
+            // showSearchBar ?
+            const SizedBox(height: 15),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const SizedBox(width: 10),
                 Container(
-                    color: AppColorConstants
-                        .themeColor
-                        .withOpacity(0.2),
+                  height: 30,
+                  width: 30,
+                  color: AppColorConstants.themeColor,
+                  child: ThemeIconWidget(
+                    ThemeIcon.plus,
+                    color: AppColorConstants.whiteClr,
+                  ),
+                ).circular.ripple(() {
+                  selectUsers();
+                }),
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.only(left: 10,right: 10),
+                    height: 45,
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                          color: AppColorConstants.grayscale300,
+                        ),
+                        borderRadius: const BorderRadius.all(Radius.circular(5))
+                    ),
+                    child: SearchBarWithoutMargin(
+                      showSearchIcon: true,
+                      hintText: LocalizationString.searchUserGroup,
+                      iconColor: AppColorConstants.themeColor,
+                      onSearchChanged: (value) {
+                        _chatController.searchTextChanged(value);
+                      },
+                      onSearchStarted: () {
+                        //controller.startSearch();
+                      },
+                      onSearchCompleted: (searchTerm) {},
+                    ),
+                  ),
+                ),
+                settingsController.setting.value!.enableAudioCalling ?
+                    Container(
+                      height: 30,
+                      width: 30,
+                      color: AppColorConstants.themeColor,
+                      child: ThemeIconWidget(
+                        ThemeIcon.mobile,
+                        color: AppColorConstants.whiteClr,
+                      ),
+                    ).circular.ripple(() {
+                      Get.to(() => const CallHistory());
+                    }) : const SizedBox(),
+
+                const SizedBox(width: 10),
+              ],
+            ),
+            const SizedBox(height: 15),
+            // : const SizedBox.shrink(),
+            divider(context: context).tP8,
+
+            // Modified code for createGroup and strangerChat sections in a single row
+            Container(
+              padding: const EdgeInsets.only(left: 11),
+              child: Row(
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // createGroup section
+                  Container(
+                    color: AppColorConstants.themeColor.withOpacity(0.2),
                     child: ThemeIconWidget(
                       ThemeIcon.group,
                       size: 15,
-                      color: AppColorConstants
-                          .themeColor,
-                    ).p8)
-                    .circular,
-                const SizedBox(
-                  width: 16,
-                ),
-                Heading6Text(
-                  LocalizationString.createGroup,
-                  weight: TextWeight.semiBold,
-                )
-              ],
-            ),
-          ).ripple(() {
-            Get.back();
-            Get.to(() =>
-            const SelectUserForGroupChat());
-          }).hP16,
-          divider(context: context).tP8,
-          SizedBox(
-            height: 40,
-            child: Row(
-              children: [
-                Container(
-                    color: AppColorConstants
-                        .themeColor
-                        .withOpacity(0.2),
+                      color: AppColorConstants.themeColor,
+                    ).p8,
+                  ).circular,
+                  const SizedBox(
+                    width: 1,
+                  ),
+                  Heading6Text(
+                    LocalizationString.createGroup,
+                    weight: TextWeight.semiBold,
+                  ).ripple(() {
+                    Get.back();
+                    Get.to(() => const SelectUserForGroupChat());
+                  }).hP16,
+
+                  // Add some spacing between the sections
+                  const SizedBox(
+                    width: 5,
+                  ),
+
+                  // strangerChat section
+                  Container(
+                    color: AppColorConstants.themeColor.withOpacity(0.2),
                     child: ThemeIconWidget(
                       ThemeIcon.randomChat,
                       size: 15,
-                      color: AppColorConstants
-                          .themeColor,
-                    ).p8)
-                    .circular,
-                const SizedBox(
-                  width: 16,
-                ),
-                Heading6Text(
-                  LocalizationString.strangerChat,
-                  weight: TextWeight.semiBold,
-                )
-              ],
+                      color: AppColorConstants.themeColor,
+                    ).p8,
+                  ).circular,
+                  const SizedBox(
+                    width: 2,
+                  ),
+                  Heading6Text(
+                    LocalizationString.strangerChat,
+                    weight: TextWeight.semiBold,
+                  ).ripple(() {
+                    Get.to(() => const ChooseProfileCategory(
+                          isCalling: false,
+                        ));
+                  }).hP16,
+                ],
+              ),
             ),
-          ).ripple(() {
-            Get.to(
-                    () => const ChooseProfileCategory(
-                  isCalling: false,
-                ));
-          }).hP16,
-          divider(context: context).tP8,
-          // SearchBar(
-          //     showSearchIcon: true,
-          //     iconColor: AppColorConstants.themeColor,
-          //     onSearchChanged: (value) {
-          //       _chatController.searchTextChanged(value);
-          //     },
-          //     onSearchStarted: () {
-          //       //controller.startSearch();
-          //     },
-          //     onSearchCompleted: (searchTerm) {})
-          //     .p16,
-          Expanded(child: chatListView().hP16)
-        ],
-      )),
+
+            divider(context: context).tP8,
+
+            // SearchBar code...
+
+            Expanded(child: chatListView().hP16),
+          ],
+        ),
+      ),
     );
   }
 
@@ -234,8 +243,7 @@ class _ChatHistoryState extends State<ChatHistory> {
                     return Dismissible(
                       key: UniqueKey(),
                       onDismissed: (direction) {
-                        _chatController
-                            .deleteRoom(_chatController.searchedRooms[index]);
+                        _chatController.deleteRoom(_chatController.searchedRooms[index]);
                       },
                       background: Container(
                         color: AppColorConstants.red,
@@ -244,22 +252,19 @@ class _ChatHistoryState extends State<ChatHistory> {
                           children: [
                             Heading6Text(
                               LocalizationString.delete,
-                            weight: TextWeight.bold,
+                              weight: TextWeight.bold,
                               color: AppColorConstants.grayscale700,
-
                             )
                           ],
                         ).hP25,
                       ),
-                      child: ChatHistoryTile(
-                              model:
-                              //_chatController.allRooms[index]
-                              _chatController.searchedRooms[index]
-                      )
+                      child: ChatHistoryTile(model:
+                                  //_chatController.allRooms[index]
+                                  _chatController.searchedRooms[index])
                           .ripple(() {
                         ChatRoomModel model =
                             _chatController.searchedRooms[index];
-                        _chatController.clearUnreadCount(chatRoom: model);
+                            _chatController.clearUnreadCount(chatRoom: model);
 
                         Get.to(() => ChatDetail(chatRoom: model))!
                             .then((value) {
@@ -284,28 +289,31 @@ class _ChatHistoryState extends State<ChatHistory> {
 
   void selectUsers() {
     showModalBottomSheet(
-        backgroundColor: Colors.transparent,
-        context: context,
-        isScrollControlled: true,
-        builder: (context) => FractionallySizedBox(
-              heightFactor: 0.95,
-              child: SelectUserForChat(userSelected: (user) {
-                _chatDetailController.getChatRoomWithUser(
-                    userId: user.id,
-                    callback: (room) {
-                      EasyLoading.dismiss();
+      backgroundColor: Colors.transparent,
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => FractionallySizedBox(
+        heightFactor: 0.95,
+        child: SelectUserForChat(
+          userSelected: (user) {
+            _chatDetailController.getChatRoomWithUser(
+                userId: user.id,
+                callback: (room) {
+                  EasyLoading.dismiss();
 
-                      Get.close(1);
-                      print('this is opponent id ${user.id}');
-                      Get.to(() => ChatDetail(
-                                // opponent: usersList[index - 1].toChatRoomMember,
-                                chatRoom: room,
-                              ))!
-                          .then((value) {
-                        _chatController.getChatRooms();
-                      });
-                    });
-              }),
-            ));
+                  Get.close(1);
+                  print('this is opponent id ${user.id}');
+                  Get.to(() => ChatDetail(
+                            // opponent: usersList[index - 1].toChatRoomMember,
+                            chatRoom: room,
+                          ))!
+                      .then((value) {
+                    _chatController.getChatRooms();
+                  });
+                });
+          },
+        ),
+      ),
+    );
   }
 }

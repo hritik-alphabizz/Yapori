@@ -9,6 +9,7 @@ import 'package:foap/screens/chat/drawing_screen.dart';
 import 'package:get/get.dart';
 import 'package:foap/helper/imports/chat_imports.dart';
 import 'package:giphy_get/giphy_get.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../../model/location.dart';
 import '../../util/constant_util.dart';
@@ -103,46 +104,46 @@ class _ChatMediaSharingOptionPopupState
     super.dispose();
   }
 
+  //addon comment changes on popup design code for dynamic height of content
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Wrap(
       children: [
-        Expanded(
-          child: Container(
-            color: AppColorConstants.backgroundColor,
-            child: GridView.builder(
-                itemCount: mediaTypes.length,
-                padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    crossAxisSpacing: 5.0,
-                    mainAxisSpacing: 5.0,
-                    childAspectRatio: 0.8),
-                itemBuilder: (ctx, index) {
-                  return Column(
-                    children: [
-                      Container(
-                          height: 40,
-                          width: 40,
-                          color: AppColorConstants.cardColor.darken(),
-                          child: ThemeIconWidget(
-                            mediaTypes[index].icon,
-                            size: 18,
-                          )).circular,
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      BodyMediumText(
-                        mediaTypes[index].text,
-                      )
-                    ],
-                  ).ripple(() {
-                    handleAction(mediaTypes[index]);
-                  });
-                }),
-          ).round(20).p16,
-        ),
+        Container(
+          color: AppColorConstants.backgroundColor,
+          child: GridView.builder(
+              itemCount: mediaTypes.length,
+              shrinkWrap: true,
+              padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 5.0,
+                  mainAxisSpacing: 5.0,
+                  childAspectRatio: 0.8),
+              itemBuilder: (ctx, index) {
+                return Column(
+                  children: [
+                    Container(
+                        height: 40,
+                        width: 40,
+                        color: AppColorConstants.cardColor.darken(),
+                        child: ThemeIconWidget(
+                          mediaTypes[index].icon,
+                          size: 18,
+                        )).circular,
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    BodyMediumText(
+                      mediaTypes[index].text,
+                    )
+                  ],
+                ).ripple(() {
+                  handleAction(mediaTypes[index]);
+                });
+              }),
+        ).round(20).p16,
         const SizedBox(
           height: 10,
         ),
@@ -372,6 +373,7 @@ class _ChatMediaSharingOptionPopupState
         ));
   }
 
+  //addon comment added a condition for 10 greater than 10 mb video size
   void openFilePicker() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -416,23 +418,47 @@ class _ChatMediaSharingOptionPopupState
             media: media,
             mode: _chatDetailController.actionMode.value,
             room: _chatDetailController.chatRoom.value!);
+        Get.back();
       } else if (file.mediaType == GalleryMediaType.video) {
-        _chatDetailController.sendVideoMessage(
-            media: media,
-            mode: _chatDetailController.actionMode.value,
-            room: _chatDetailController.chatRoom.value!);
+
+        //added more than 10 mb video size condition & video thumbnail
+
+        int size = await file.length();
+
+        if((size * 0.001) > 10240)
+        {
+            Get.back();
+           AppUtil.showMessageAlert(title: LocalizationString.alert,subTitle: LocalizationString.videoupload10mbMessage, okHandler: (){});
+        }else
+        {
+          final thumbnail = await VideoThumbnail.thumbnailData(
+            video: file.path,
+            imageFormat: ImageFormat.PNG,
+            maxWidth: 128,
+            quality: 25,
+          );
+
+          thumbnail!=null ? media.thumbnail = thumbnail : null;
+
+          _chatDetailController.sendVideoMessage(
+              media: media,
+              mode: _chatDetailController.actionMode.value,
+              room: _chatDetailController.chatRoom.value!);
+          Get.back();
+        }
       } else if (file.mediaType == GalleryMediaType.audio) {
         _chatDetailController.sendAudioMessage(
             media: media,
             mode: _chatDetailController.actionMode.value,
             room: _chatDetailController.chatRoom.value!);
+        Get.back();
       } else {
         _chatDetailController.sendFileMessage(
             media: media,
             mode: _chatDetailController.actionMode.value,
             room: _chatDetailController.chatRoom.value!);
+        Get.back();
       }
-      Get.back();
     } else {
       // User canceled the picker
     }

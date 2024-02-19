@@ -66,11 +66,13 @@ class SocketManager {
         ],
       },
     );
+
     print('this is socket url ${ApiConstants.webSocketOption} ${ApiConstants.pollingOption}');
     getIt<VoipController>().listenerSetup();
 
     // if(_socketInstance!.connected == false){
     _socketInstance?.connect();
+    print("Socket connection ${_socketInstance!.connected}");
     // }
 
     socketGlobalListeners();
@@ -102,8 +104,7 @@ class SocketManager {
 
     // chat end point handlers
     _socketInstance?.on(SocketConstants.sendMessage, onReceiveMessage);
-    _socketInstance?.on(
-        SocketConstants.updateMessageStatus, updateMessageStatus);
+    _socketInstance?.on(SocketConstants.updateMessageStatus, updateMessageStatus);
     _socketInstance?.on(SocketConstants.deleteMessage, onDeleteMessage);
     _socketInstance?.on(SocketConstants.addUserInChatRoom, addedInRoom);
 
@@ -199,6 +200,7 @@ class SocketManager {
 
 //******************* Chat ****************************//
 
+  //addon comment
   void onReceiveMessage(dynamic response) async {
     ChatMessageModel message = ChatMessageModel.fromJson(response);
     int senderId = response['userId'];
@@ -221,18 +223,26 @@ class SocketManager {
     _dashboardController.updateUnreadMessageCount(roomsWithUnreadMessageCount);
   }
 
+  //addon comment not getting userId
   void onDeleteMessage(dynamic response) {
     int deleteScope = response['deleteScope'] as int;
     int roomId = response['room'] as int;
     int messageId = response['id'] as int;
-    int userId = response['user_id'] as int;
+
+    //int userId = response['user_id'] as int;
+
+    /*if (deleteScope == 2) {
+      _chatDetailController.messagedDeleted(messageId: messageId, roomId: roomId, userId: userId);
+    }*/
+
+    log("event delete message "+response.toString());
 
     if (deleteScope == 2) {
-      _chatDetailController.messagedDeleted(
-          messageId: messageId, roomId: roomId, userId: userId);
+      _chatDetailController.messagedDeleted(messageId: messageId, roomId: roomId, userId: 0);
     }
   }
 
+  //addon comment
   void onReceiveTyping(dynamic response) {
     var userName = response['username'];
     var roomId = response['room'];
@@ -245,10 +255,13 @@ class SocketManager {
 
   void updateMessageStatus(dynamic response) {
     _chatDetailController.messageUpdateReceived(response);
+    log("Message Update "+response.toString());
   }
 
+  //addon comment some time getting null or string type userId
   void onOfflineStatusEvent(dynamic response) {
-    var userId = response['userId'];
+    //var userId = response['userId'];
+    var userId = int.parse(response['userId']!=null ? response['userId'].toString() !="" ? response['userId'].toString() : "0" : "0");
 
     _chatController.userAvailabilityStatusChange(
         userId: userId, isOnline: false);
@@ -256,8 +269,10 @@ class SocketManager {
         userId: userId, isOnline: false);
   }
 
+  //addon comment some time getting null or string userId
   void onOnlineStatusEvent(dynamic response) {
-    var userId = response['userId'];
+    //var userId = response['userId'];
+    var userId = int.parse(response['userId']!=null ? response['userId'].toString()!="" ? response['userId'].toString() : "0" : "0");
     _chatController.userAvailabilityStatusChange(
         userId: userId, isOnline: true);
     _chatDetailController.userAvailabilityStatusChange(

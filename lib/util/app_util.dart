@@ -128,6 +128,69 @@ class AppUtil {
     );
   }
 
+  //addon comment added new dialog
+  static void showMessageAlert(
+      {required String title,
+        required String subTitle,
+        required VoidCallback okHandler}) {
+    showDialog(
+      context: Get.context!,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            height: 200,
+            width: Get.width,
+            color: AppColorConstants.backgroundColor,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Heading3Text(
+                  title,
+                  color: AppColorConstants.themeColor,
+                  weight: TextWeight.bold,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Heading6Text(
+                  subTitle,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Spacer(),
+                        SizedBox(
+                          width: 100,
+                          height: 40,
+                          child: AppThemeBorderButton(
+                              text: LocalizationString.ok,
+                              onPress: () {
+                                Get.back(closeOverlays: true);
+                                okHandler();
+                              }),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+              ],
+            ).hP16,
+          ).round(20),
+        );
+      },
+    );
+  }
+
   static void showDemoAppConfirmationAlert(
       {required String title,
       required String subTitle,
