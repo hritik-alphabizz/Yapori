@@ -45,6 +45,7 @@ class GiftSummary {
 
 class UserModel {
   int id = 0;
+  int notifications = 0;
 
   String? name;
   String userName = '';
@@ -121,6 +122,7 @@ class UserModel {
   factory UserModel.fromJson(dynamic json) {
     UserModel model = UserModel();
     model.id = json['id'];
+    model.notifications = json['notifications'];
     model.name = json['name'];
     model.userName = json['username'] == null
         ? ''
@@ -156,7 +158,7 @@ class UserModel {
     model.totalWinnerPost = json['totalWinnerPost'] ?? 0;
 
     model.isReported = json['is_reported'] == 1;
-    model.isPrivate = json['profile_visibility'] == 2 ;
+    model.isPrivate = json['profile_visibility'] == 2;
     model.isOnline = json['is_chat_user_online'] == 1;
     model.chatLastTimeOnline = json['chat_last_time_online'];
     model.accountCreatedWith = json['account_created_with'] ?? 1;
@@ -216,6 +218,7 @@ class UserModel {
 
   Map<String, dynamic> toJson() => {
         "id": id,
+        "notifications": notifications,
         "username": userName,
         "email": email,
         "picture": picture,
@@ -235,6 +238,7 @@ class UserModel {
   static UserModel placeholderUser() {
     UserModel model = UserModel();
     model.id = 1;
+    model.notifications = 0;
     model.userName = LocalizationString.loading;
     // model.name = LocalizationString.loading;
     model.email = LocalizationString.loading;

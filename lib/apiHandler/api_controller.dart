@@ -1201,6 +1201,7 @@ class ApiController {
         (competitionId == null
             ? NetworkConstantsUtil.addPost
             : NetworkConstantsUtil.addCompetitionPost));
+    print(NetworkConstantsUtil.addPost.toString() + "HERRRREEE2222");
 
     var parameters = {
       "type": postType.toString(),
@@ -1232,6 +1233,8 @@ class ApiController {
           competitionId == null
               ? NetworkConstantsUtil.addPost
               : NetworkConstantsUtil.addCompetitionPost);
+      log(parsedResponse.toString() + "HERRRREEE");
+
       return parsedResponse;
     });
   }

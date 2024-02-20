@@ -422,28 +422,36 @@ class HomeFeedState extends State<HomeFeedScreen> {
                               ).ripple(() {
                                 Get.to(() => const NotificationsScreen());
                               }),
-                              // Positioned(
-                              //   right: 0,
-                              //   child: Container(
-                              //     padding: EdgeInsets.all(1),
-                              //     decoration: new BoxDecoration(
-                              //       color: Colors.red,
-                              //       borderRadius: BorderRadius.circular(6),
-                              //     ),
-                              //     constraints: BoxConstraints(
-                              //       minWidth: 12,
-                              //       minHeight: 12,
-                              //     ),
-                              //     child: new Text(
-                              //       '2',
-                              //       style: new TextStyle(
-                              //         color: Colors.white,
-                              //         fontSize: 8,
-                              //       ),
-                              //       textAlign: TextAlign.center,
-                              //     ),
-                              //   ),
-                              // )
+                              Visibility(
+                                visible: _profileController
+                                        .user.value!.notifications
+                                        .toString() !=
+                                    "0",
+                                child: Positioned(
+                                  right: 0,
+                                  child: Container(
+                                    padding: EdgeInsets.all(1),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    constraints: BoxConstraints(
+                                      minWidth: 12,
+                                      minHeight: 12,
+                                    ),
+                                    child: Text(
+                                      _profileController
+                                          .user.value!.notifications
+                                          .toString(),
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 8,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                              )
                             ],
                           ),
                         ),
