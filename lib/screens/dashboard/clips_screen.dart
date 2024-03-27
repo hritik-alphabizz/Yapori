@@ -17,6 +17,7 @@ class ClipsScreen extends StatefulWidget {
 class _ClipsScreenState extends State<ClipsScreen> {
   final ReelsController _reelsController = Get.find();
   final SettingsController _settingsController = Get.find();
+
   ///NATIVE ADS
   NativeAd? _nativeAd;
   bool _nativeAdIsLoaded = false;
@@ -26,7 +27,8 @@ class _ClipsScreenState extends State<ClipsScreen> {
     super.initState();
     _reelsController.getReels();
     _nativeAd = NativeAd(
-      adUnitId: _settingsController.setting.value!.interstitialAdUnitIdForAndroid!,
+      adUnitId:
+          _settingsController.setting.value!.interstitialAdUnitIdForAndroid!,
       //'ca-app-pub-3940256099942544/1044960115',
       //'ca-app-pub-3940256099942544/6300978111',
       request: AdRequest(),
@@ -70,37 +72,42 @@ class _ClipsScreenState extends State<ClipsScreen> {
       top: false,
       child: Scaffold(
           backgroundColor: AppColorConstants.backgroundColor,
-          floatingActionButton: Container(
-            height: 50,
-            width: 50,
-            color: AppColorConstants.themeColor.withOpacity(0.7),
-            child: ThemeIconWidget(
-              ThemeIcon.edit,
-              color: AppColorConstants.whiteClr,
-              size: 25,
+          floatingActionButton: Padding(
+            padding: const EdgeInsets.only(
+              bottom: 70,
             ),
-          ).circular.ripple(() {
-            Future.delayed(
-              Duration.zero,
-              () => showGeneralDialog(
-                  context: context,
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      const SelectMedia(
-                        mediaType: PostMediaType.video,
-                        isClips: true,
-                      )),
-            );
-            // Get.to(() => const CreateReelScreen(
-            //       isScene: false,
-            //     ));
-            // Future.delayed(
-            //   Duration.zero,
-            //       () => showGeneralDialog(
-            //       context: context,
-            //       pageBuilder: (context, animation, secondaryAnimation) =>
-            //       const SelectMedia()),
-            // );
-          }),
+            child: Container(
+              height: 50,
+              width: 50,
+              color: Colors.black.withOpacity(0.4),
+              child: ThemeIconWidget(
+                ThemeIcon.edit,
+                color: AppColorConstants.whiteClr,
+                size: 25,
+              ),
+            ).circular.ripple(() {
+              Future.delayed(
+                Duration.zero,
+                () => showGeneralDialog(
+                    context: context,
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        const SelectMedia(
+                          mediaType: PostMediaType.video,
+                          isClips: true,
+                        )),
+              );
+              // Get.to(() => const CreateReelScreen(
+              //       isScene: false,
+              //     ));
+              // Future.delayed(
+              //   Duration.zero,
+              //       () => showGeneralDialog(
+              //       context: context,
+              //       pageBuilder: (context, animation, secondaryAnimation) =>
+              //       const SelectMedia()),
+              // );
+            }),
+          ),
           body: Stack(
             children: [
               GetBuilder<ReelsController>(
@@ -119,8 +126,8 @@ class _ClipsScreenState extends State<ClipsScreen> {
                               i++)
                             SizedBox(
                               height:
-                              // MediaQuery.of(context).size.height,
-                              Get.height,
+                                  // MediaQuery.of(context).size.height,
+                                  Get.height,
                               width: Get.width,
                               // color: Colors.brown,
                               child: ReelVideoPlayer(

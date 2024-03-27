@@ -13,10 +13,10 @@ class AppConfigConstants {
 
   static const agoraApiKey = '52aa6d82f3f14aa3bd36b7a0fb6648f4';
 
-  static const restApiBaseUrl = 'https://ipkobrail.com/api/web/v1/';
-  //static const restApiBaseUrl = 'https://yapori.in/api/web/v1/';
+  static const restApiBaseUrl = 'https://yapori.in/api/web/v1/';
 
-  static const socketApiBaseUrl = 'http://ipkobrail.com:4000/';
+  static const socketApiBaseUrl = 'http://yapori.in:4000/';
+
   // static const socketApiBaseUrl = 'http://yapori.in:4000/';
   // Chat encryption key -- DO NOT CHANGE THIS
   static const encryptionKey = 'bbC2H19lkVbQDfakxcrtNMQdd0FloLyw';
@@ -73,11 +73,12 @@ class AppColorConstants {
 
   static Color get inputFieldPlaceholderTextColor =>
       isDarkMode ? const Color(0xFF3F434E) : const Color(0xFF9E9E9E);
-
+  static Color get yellow => isDarkMode ? Colors.yellow : Colors.yellow;
   static Color get red => isDarkMode ? Colors.red : Colors.red;
   static Color blueClr = Colors.blue;
   static Color whiteClr = Colors.white;
   static Color get green => isDarkMode ? Colors.green : Colors.green;
+  static Color get reelColor => isDarkMode ? Colors.white : Colors.teal;
 
   // text colors
 

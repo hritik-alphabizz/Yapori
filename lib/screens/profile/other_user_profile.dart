@@ -149,13 +149,16 @@ class OtherUserProfileState extends State<OtherUserProfile> {
             ThemeIconWidget(
               ThemeIcon.backArrow,
               size: 20,
-              color: AppColorConstants.iconColor,
+              color: AppColorConstants.reelColor,
             ).ripple(() {
               Get.back();
             }),
             Obx(() => _profileController.user.value != null
-                ? BodyLargeText(_profileController.user.value!.userName,
-                    weight: TextWeight.medium)
+                ? BodyLargeText(
+                    _profileController.user.value!.userName,
+                    weight: TextWeight.bold,
+                    color: Colors.teal,
+                  )
                 : Container()),
             Obx(() => _profileController.user.value?.isMe == false
                 ? SizedBox(
@@ -163,7 +166,7 @@ class OtherUserProfileState extends State<OtherUserProfile> {
                     width: 20,
                     child: ThemeIconWidget(
                       ThemeIcon.more,
-                      color: AppColorConstants.iconColor,
+                      color: AppColorConstants.reelColor,
                       size: 20,
                     ).ripple(() {
                       openActionPopup();
@@ -225,7 +228,8 @@ class OtherUserProfileState extends State<OtherUserProfile> {
                           _profileController.user.value!.bio != null
                               ? BodyMediumText(
                                   _profileController.user.value!.bio.toString(),
-                                  weight: TextWeight.medium)
+                                  weight: TextWeight.medium,
+                                )
                               : const SizedBox.shrink(),
                           _profileController.user.value!.qualification !=
                                       null ||
@@ -276,8 +280,11 @@ class OtherUserProfileState extends State<OtherUserProfile> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Heading6Text(_profileController.user.value!.userName,
-                      weight: TextWeight.medium),
+                  Heading6Text(
+                    _profileController.user.value!.userName,
+                    weight: TextWeight.medium,
+                    color: Colors.teal,
+                  ),
                   if (_profileController.user.value!.isVerified)
                     Row(
                       children: [
@@ -292,24 +299,28 @@ class OtherUserProfileState extends State<OtherUserProfile> {
                       ],
                     ),
                   BodyMediumText(
-                      _profileController.user.value!.gender == '0'
-                          ? ' '
-                          : _profileController.user.value!.gender == '1'
-                              ? ' , Male'
-                              : _profileController.user.value!.gender == '2'
-                                  ? ' , Female'
-                                  : ' , Other',
-                      weight: TextWeight.medium),
+                    _profileController.user.value!.gender == '0'
+                        ? ' '
+                        : _profileController.user.value!.gender == '1'
+                            ? ' , Male'
+                            : _profileController.user.value!.gender == '2'
+                                ? ' , Female'
+                                : ' , Other',
+                    weight: TextWeight.medium,
+                    color: Colors.teal,
+                  ),
                 ],
               ).bP4,
               if (_profileController.user.value!.profileCategoryTypeId != 0)
                 BodyLargeText(
-                        _profileController.user.value!.profileCategoryTypeName,
-                        weight: TextWeight.regular)
-                    .bP4,
+                  _profileController.user.value!.profileCategoryTypeName,
+                  weight: TextWeight.regular,
+                  color: Colors.teal,
+                ).bP4,
               _profileController.user.value?.country != null
                   ? BodyMediumText(
                       '${_profileController.user.value!.country}',
+                      color: Colors.teal,
                     )
                   : Container(),
             ],
@@ -499,7 +510,7 @@ class OtherUserProfileState extends State<OtherUserProfile> {
         selectedTextStyle: TextStyle(
             fontSize: FontSizes.b2,
             fontWeight: TextWeight.bold,
-            color: AppColorConstants.themeColor),
+            color: AppColorConstants.reelColor),
         width: MediaQuery.of(context).size.width,
         onSegmentChange: (segment) {
           _profileController.segmentChanged(segment);
@@ -685,8 +696,11 @@ class OtherUserProfileState extends State<OtherUserProfile> {
         builder: (context) => Wrap(
               children: [
                 ListTile(
-                    title:
-                        Center(child: BodyLargeText(LocalizationString.report)),
+                    title: Center(
+                        child: BodyLargeText(
+                      LocalizationString.report,
+                      color: Colors.teal,
+                    )),
                     onTap: () async {
                       Get.back();
 
@@ -703,8 +717,11 @@ class OtherUserProfileState extends State<OtherUserProfile> {
                     }),
                 divider(context: context),
                 ListTile(
-                    title:
-                        Center(child: BodyLargeText(LocalizationString.cancel)),
+                    title: Center(
+                        child: BodyLargeText(
+                      LocalizationString.cancel,
+                      color: Colors.teal,
+                    )),
                     onTap: () {
                       Get.back();
                     }),

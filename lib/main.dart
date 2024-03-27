@@ -71,6 +71,16 @@ Future<void> main() async {
 
   Wakelock.enable();
   await Firebase.initializeApp();
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    print(details.exception.toString());
+    print(details.library.toString());
+    print(details.exceptionAsString().toString());
+    print(details.stack.toString());
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(body: Center(child: CircularProgressIndicator())),
+    );
+  };
   // await EasyLocalization.ensureInitialized();
   await FlutterDownloader.initialize(
       debug: true,

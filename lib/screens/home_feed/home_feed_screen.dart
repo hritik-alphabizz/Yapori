@@ -46,6 +46,7 @@ class HomeFeedState extends State<HomeFeedScreen> {
   final AgoraLiveController _agoraLiveController = Get.find();
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
+  bool isLocationApiCalled = false;
   final SettingsController _settingsController = Get.find();
   final ProfileController _profileController = Get.find();
   RxString latitude = "".obs;
@@ -65,7 +66,7 @@ class HomeFeedState extends State<HomeFeedScreen> {
     } else {
       showDialog(
         context: context,
-        barrierDismissible: false,
+        barrierDismissible: true,
         builder: (BuildContext context) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
@@ -118,10 +119,11 @@ class HomeFeedState extends State<HomeFeedScreen> {
     }
   }
 
+  bool isFirstTym = true;
+
   @override
   void initState() {
     super.initState();
-    checkPermission();
 
     _nativeAd = NativeAd(
       adUnitId:
@@ -163,8 +165,6 @@ class HomeFeedState extends State<HomeFeedScreen> {
     });
 
     _controller.addListener(() {
-      checkPermission();
-
       if (_controller.position.atEdge) {
         bool isTop = _controller.position.pixels == 0;
         if (isTop) {
@@ -238,6 +238,10 @@ class HomeFeedState extends State<HomeFeedScreen> {
         callback: () {
           _refreshController.refreshCompleted();
         });
+    if (isFirstTym) {
+      isFirstTym = false;
+      checkPermission();
+    } else {}
   }
 
   void loadData({required bool? isRecent}) {
@@ -254,7 +258,7 @@ class HomeFeedState extends State<HomeFeedScreen> {
     // adState.initialisation.then((status) {
     setState(() {
       _nativeAd = NativeAd(
-        adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+        adUnitId: 'ca-app-pub-3234665702879990/7100969049',
         request: AdRequest(),
         listener: NativeAdListener(
           onAdLoaded: (Ad ad) {
@@ -288,10 +292,35 @@ class HomeFeedState extends State<HomeFeedScreen> {
     super.didUpdateWidget(oldWidget);
   }
 
+  int calculateTimeDifference(DateTime earlier, DateTime later) {
+    Duration difference = later.difference(earlier);
+
+    // Convert the duration to minutes
+    return difference.inMinutes;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(() => Scaffold(
         backgroundColor: AppColorConstants.backgroundColor,
+        bottomNavigationBar: !_homeController.isLoading.value
+            ? SizedBox()
+            : Container(
+                height: 60,
+                child: Column(
+                  children: [
+                    Container(
+
+                        // width: 25,
+                        child: Center(
+                            child: Image.asset(
+                      "assets/images/Animation - 1708686222625.gif",
+                      height: 30,
+                    ))),
+                    Text("Loading more posts")
+                  ],
+                ),
+              ),
         floatingActionButton: Container(
           height: 50,
           width: 50,
@@ -301,9 +330,14 @@ class HomeFeedState extends State<HomeFeedScreen> {
             color: AppColorConstants.whiteClr,
             size: 25,
           ),
-        ).circular.ripple(() {
+        ).circular.ripple(() async {
           print("floatingActionButton pressed");
           // Navigator.push(context, MaterialPageRoute(builder: (context)=> VideoFilterScreen()));
+          // print(DateTime.now().toString() + "CURRENT TIME");
+          // String? previousTime = await SharedPrefs().getUploadTime();
+
+          // if (previousTime == null || previousTime.trim().isEmpty) {
+          //   await SharedPrefs().setUploadTime(DateTime.now().toString());
           Future.delayed(
             Duration.zero,
             () => showGeneralDialog(
@@ -313,6 +347,38 @@ class HomeFeedState extends State<HomeFeedScreen> {
                       isClips: false,
                     )),
           );
+          // } else {
+          //   // Define the two times as strings
+          //   String earlierTimeString = previousTime;
+
+          //   // Parse the strings into DateTime objects
+          //   DateTime earlierTime = DateTime.parse(earlierTimeString);
+          //   DateTime laterTime = DateTime.now();
+
+          //   // Calculate the difference
+          //   int differenceInMinutes =
+          //       calculateTimeDifference(earlierTime, laterTime);
+          //   print("${differenceInMinutes} DIFFERENCE TIME");
+          //   if (differenceInMinutes > 60) {
+          //     await SharedPrefs().setUploadTime(DateTime.now().toString());
+          //     Future.delayed(
+          //       Duration.zero,
+          //       () => showGeneralDialog(
+          //           context: context,
+          //           pageBuilder: (context, animation, secondaryAnimation) =>
+          //               const SelectMedia(
+          //                 isClips: false,
+          //               )),
+          //     );
+          //   } else {
+          //     Get.snackbar("Alert",
+          //         "Please try to upload media after ${60 - differenceInMinutes} minutes.",
+          //         snackPosition: SnackPosition.BOTTOM,
+          //         colorText: AppColorConstants.whiteClr,
+          //         backgroundColor: AppColorConstants.themeColor.darken(),
+          //         icon: Icon(Icons.error, color: AppColorConstants.iconColor));
+          //   }
+          // }
         }),
         // appBar: AppBar(
         //   backgroundColor: AppColorConstants.backgroundColor,
@@ -701,12 +767,16 @@ class HomeFeedState extends State<HomeFeedScreen> {
     List<Placemark> placemark = await placemarkFromCoordinates(
         double.parse(latitude.value), double.parse(longitude.value),
         localeIdentifier: "en");
-    ApiController()
-        .updateUserLocation(
-            latitude.value, longitude.value, placemark.first.country ?? "")
-        .then((response) {
-      //AppUtil.showToast(message: response.message, isSuccess: false);
-    });
+    if (isLocationApiCalled) {
+    } else {
+      ApiController()
+          .updateUserLocation(
+              latitude.value, longitude.value, placemark.first.country ?? "")
+          .then((response) {
+        isLocationApiCalled = true;
+        //AppUtil.showToast(message: response.message, isSuccess: false);
+      });
+    }
 
     // var stateName =
     //     stateAbbreviationMapFunction(placemark[0].administrativeArea!);
@@ -720,13 +790,18 @@ class HomeFeedState extends State<HomeFeedScreen> {
               itemCount: _homeController.posts.length + 3,
               itemBuilder: (context, index) {
                 if (index == 0) {
-                  print(_homeController.stories.length.toString() +
-                      "HOME STORIES LENGTH");
-                  print(_homeController.stories.first.image.toString() +
-                      "HOME STORIES LENGTH");
-                  if (_homeController.stories.first.image == null) {
-                    _homeController.isRefreshingStories.value = false;
+                  try {
+                    print(_homeController.stories.length.toString() +
+                        "HOME STORIES LENGTH");
+                    print(_homeController.stories.first.image.toString() +
+                        "HOME STORIES LENGTH");
+                    if (_homeController.stories.first.image == null) {
+                      _homeController.isRefreshingStories.value = false;
+                    }
+                  } catch (stacktrace) {
+                    print(stacktrace.toString());
                   }
+
                   return Obx(() =>
                       _homeController.isRefreshingStories.value == true
                           ? const StoryAndHighlightsShimmer()
@@ -849,12 +924,12 @@ class AppSettingsDialog extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            TextButton(
-              onPressed: () {
-                openAppSettings();
-              },
-              child: const Text("Open Settings"),
-            ),
+            // TextButton(
+            //   onPressed: () {
+            //     openAppSettings();
+            //   },
+            //   child: const Text("Open Settings"),
+            // ),
             TextButton(
               onPressed: () {
                 cancelDialog();

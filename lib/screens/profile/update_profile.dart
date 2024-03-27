@@ -124,7 +124,8 @@ class UpdateProfileState extends State<UpdateProfile> {
                       const Spacer(),
                       Obx(() => profileController.user.value != null
                           ? BodyMediumText(
-                              profileController.user.value!.profileCategoryTypeName,
+                              profileController
+                                  .user.value!.profileCategoryTypeName,
                             )
                           : Container()),
                       const SizedBox(
@@ -202,12 +203,12 @@ class UpdateProfileState extends State<UpdateProfile> {
                       const Spacer(),
                       Obx(() => profileController.user.value != null
                           ? Container(
-                        width: MediaQuery.of(context).size.width/2.5,
-                            child: BodyMediumText(
+                              width: MediaQuery.of(context).size.width / 2.5,
+                              child: BodyMediumText(
                                 profileController.user.value!.paypalId ?? '',
-                        maxLines: 2,
+                                maxLines: 2,
                               ),
-                          )
+                            )
                           : Container()),
                       const SizedBox(
                         width: 20,
@@ -231,12 +232,12 @@ class UpdateProfileState extends State<UpdateProfile> {
                       const Spacer(),
                       Obx(() => profileController.user.value != null
                           ? Container(
-                        width: MediaQuery.of(context).size.width/2.5,
-                            child: BodyMediumText(
-                        profileController.user.value!.bio ?? '',
-                              maxLines: 2,
-                      ),
-                          )
+                              width: MediaQuery.of(context).size.width / 2.5,
+                              child: BodyMediumText(
+                                profileController.user.value!.bio ?? '',
+                                maxLines: 2,
+                              ),
+                            )
                           : Container()),
                       const SizedBox(
                         width: 20,
@@ -260,11 +261,15 @@ class UpdateProfileState extends State<UpdateProfile> {
                       const Spacer(),
                       Obx(() => profileController.user.value != null
                           ? BodyMediumText(
-                        profileController.user.value!.gender == '0' ? "" :
-                        profileController.user.value!.gender == '1' ? "Male" :
-                        profileController.user.value!.gender == '2' ? "Female"
-                            : "Other" ?? '',
-                      )
+                              profileController.user.value!.gender == '0'
+                                  ? ""
+                                  : profileController.user.value!.gender == '1'
+                                      ? "Male"
+                                      : profileController.user.value!.gender ==
+                                              '2'
+                                          ? "Female"
+                                          : "Other" ?? '',
+                            )
                           : Container()),
                       const SizedBox(
                         width: 20,
@@ -288,8 +293,8 @@ class UpdateProfileState extends State<UpdateProfile> {
                       const Spacer(),
                       Obx(() => profileController.user.value != null
                           ? BodyMediumText(
-                        profileController.user.value!.qualification ?? '',
-                      )
+                              profileController.user.value!.qualification ?? '',
+                            )
                           : Container()),
                       const SizedBox(
                         width: 20,
@@ -299,7 +304,8 @@ class UpdateProfileState extends State<UpdateProfile> {
                         color: AppColorConstants.iconColor,
                         size: 15,
                       ).ripple(() {
-                        Get.to(() => const ChangeProfileQualification())!.then((value) {
+                        Get.to(() => const ChangeProfileQualification())!
+                            .then((value) {
                           reloadData();
                         });
                       })
@@ -313,8 +319,8 @@ class UpdateProfileState extends State<UpdateProfile> {
                       const Spacer(),
                       Obx(() => profileController.user.value != null
                           ? BodyMediumText(
-                        profileController.user.value!.website ?? '',
-                      )
+                              profileController.user.value!.website ?? '',
+                            )
                           : Container()),
                       const SizedBox(
                         width: 20,
@@ -331,7 +337,7 @@ class UpdateProfileState extends State<UpdateProfile> {
                     ],
                   ),
                   divider(context: context).vP16,
-               /*   Row(
+                  /*   Row(
                     children: [
                       BodyLargeText(LocalizationString.location,
                           weight: TextWeight.medium),
@@ -372,83 +378,105 @@ class UpdateProfileState extends State<UpdateProfile> {
             height: 270,
             child: profileController.user.value != null
                 ? Stack(
-              alignment: Alignment.center,
+                    alignment: Alignment.center,
                     children: [
                       Stack(
                         children: [
                           Container(
-                            child:
-                                profileController.user.value!.coverImage != null
-                                    ? CachedNetworkImage(
-                                            width: Get.width,
-                                            height: 250,
-                                            fit: BoxFit.cover,
-                                            imageUrl: profileController
-                                                .user.value!.coverImage!)
-                                        .overlay(Colors.black26)
-                                        .bottomRounded(20)
-                                    : Container(
-                                        width: Get.width,
-                                        height: 250,
-                                        color: AppColorConstants.themeColor
-                                            .withOpacity(0.2),
-                                      ).bottomRounded(20),
+                            child: profileController.user.value!.coverImage !=
+                                    null
+                                ? CachedNetworkImage(
+                                    width: Get.width,
+                                    height: 250,
+                                    fit: BoxFit.cover,
+                                    imageUrl: profileController
+                                        .user.value!.coverImage!,
+                                  ).overlay(Colors.black26).bottomRounded(20)
+                                : Container(
+                                    width: Get.width,
+                                    height: 250,
+                                    color: AppColorConstants.themeColor
+                                        .withOpacity(0.2),
+                                  ).bottomRounded(20),
                           ),
                           Positioned(
-                              bottom: 10,
-                              right: 16,
-                              child: Container(
-                                color: AppColorConstants.cardColor,
-                                child: BodyLargeText(
-                                        LocalizationString.editProfileCover, color: AppColorConstants.iconColor,)
-                                    .setPadding(
-                                        left: 10, right: 10, top: 8, bottom: 8),
-                              ).circular.ripple(() {
-                                openImagePickingPopup(isCoverImage: true);
-                              }))
+                            bottom: 10,
+                            right: 16,
+                            child: Container(
+                              color: AppColorConstants.cardColor,
+                              child: BodyLargeText(
+                                LocalizationString.editProfileCover,
+                                color: AppColorConstants.iconColor,
+                              ).setPadding(
+                                  left: 10, right: 10, top: 8, bottom: 8),
+                            ).circular.ripple(() {
+                              openImagePickingPopup(isCoverImage: true);
+                            }),
+                          )
                         ],
                       ),
                       Column(
-                          children: [
-                        const SizedBox(
-                          height: 50,
-                        ),
-                        UserAvatarView(
+                        children: [
+                          const SizedBox(
+                            height: 50,
+                          ),
+                          Stack(
+                            children: [
+                              UserAvatarView(
                                 user: profileController.user.value!,
-                                size: 65,
-                                onTapHandler: () {})
-                            .ripple(() {
-                          openImagePickingPopup(isCoverImage: false);
-                        }),
-                        BodyMediumText(
-                          LocalizationString.editProfilePicture,
-                          color: AppColorConstants.whiteClr,
-                        ).vP4.ripple(() {
-                          openImagePickingPopup(isCoverImage: false);
-                        }),
-                        Heading5Text(
-                          profileController.user.value!.userName,
-                          weight: TextWeight.medium,
-                          color: AppColorConstants.whiteClr,
-                        ).setPadding(bottom: 4),
-                        profileController.user.value?.email != null
-                            ? BodyMediumText(
-                                '${profileController.user.value!.email}',
-                          color: AppColorConstants.whiteClr,
-                              )
-                            : Container(),
-                        profileController.user.value?.country != null
-                            ? BodyMediumText(
-                                profileController.user.value?.country ?? '',
-                          color: AppColorConstants.whiteClr,
-                              ).vP4
-                            : Container(),
-                      ]).p8,
+                                size: 77,
+                                onTapHandler: () {},
+                              ).ripple(() {
+                                openImagePickingPopup(isCoverImage: false);
+                              }),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: ThemeIconWidget(ThemeIcon.addCircle,
+                                          size: 30, color: Colors.teal)
+                                      .ripple(() {
+                                    openImagePickingPopup(isCoverImage: false);
+                                  }),
+                                ),
+                              ),
+                            ],
+                          ),
+                          BodyMediumText(
+                            LocalizationString.editProfilePicture,
+                            color: AppColorConstants.whiteClr,
+                          ).vP4.ripple(() {
+                            openImagePickingPopup(isCoverImage: false);
+                          }),
+                          Heading5Text(
+                            profileController.user.value!.userName,
+                            weight: TextWeight.medium,
+                            color: AppColorConstants.whiteClr,
+                          ).setPadding(bottom: 4),
+                          profileController.user.value?.email != null
+                              ? BodyMediumText(
+                                  '${profileController.user.value!.email}',
+                                  color: AppColorConstants.whiteClr,
+                                )
+                              : Container(),
+                          profileController.user.value?.country != null
+                              ? BodyMediumText(
+                                  profileController.user.value?.country ?? '',
+                                  color: AppColorConstants.whiteClr,
+                                ).vP4
+                              : Container(),
+                        ],
+                      ).p8,
                       Positioned(
-                          top: 50,
-                          left: 0,
-                          right: 0,
-                          child: backNavigationBar(context: context, title: ''))
+                        top: 40,
+                        left: 0,
+                        right: 0,
+                        child: backNavigationBar(context: context, title: ''),
+                      ),
                     ],
                   )
                 : Container(),

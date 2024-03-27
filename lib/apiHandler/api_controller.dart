@@ -1240,6 +1240,8 @@ class ApiController {
   }
 
   Future<ApiResponseModel> uploadPostMedia(String file) async {
+    String? previousTime = await SharedPrefs().getUploadTime();
+
     var url =
         // 'https://admin.fablocdn.com/v1/config/test';
         NetworkConstantsUtil.baseUrl + NetworkConstantsUtil.uploadPostImage;

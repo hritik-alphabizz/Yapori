@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import '../../components/hashtag_tile.dart';
 import '../../components/user_card.dart';
 import '../../controllers/add_post_controller.dart';
+import '../../util/shared_prefs.dart';
 import '../chat/media.dart';
 
 class AddPostScreen extends StatefulWidget {
@@ -55,11 +56,18 @@ class AddPostState extends State<AddPostScreen> {
       // }
     });
   }
-  @override
 
+  @override
   void dispose() {
     descriptionText.text = '';
     super.dispose();
+  }
+
+  int calculateTimeDifference(DateTime earlier, DateTime later) {
+    Duration difference = later.difference(earlier);
+
+    // Convert the duration to minutes
+    return difference.inMinutes;
   }
 
   @override
@@ -90,26 +98,69 @@ class AddPostState extends State<AddPostScreen> {
                                 ? LocalizationString.share
                                 : LocalizationString.submit,
                             weight: TextWeight.medium,
-            color: AppColorConstants.themeColor
-                            ,
-                          ).ripple(() {
+                            color: AppColorConstants.themeColor,
+                          ).ripple(() async {
                             print('posting started');
-                            print('working here also===>>>> ${widget.items.first.file!.path} ');
+                            print(
+                                'working here also===>>>> ${widget.items.first.file!.path} ');
                             // print('1${widget.clubId}');
                             // print('2${widget.competitionId}');
-                            addPostController.uploadAllPostFiles(
-                                context: context,
-                                isReel: widget.isReel ?? false,
-                                audioId: widget.audioId,
-                                audioStartTime: widget.audioStartTime,
-                                audioEndTime: widget.audioEndTime,
-                                items: widget.items,
-                                title: descriptionText.text,
-                                competitionId: widget.competitionId,
-                                clubId: widget.clubId);
+                            print(DateTime.now().toString() + "CURRENT TIME");
+                            String? previousTime =
+                                await SharedPrefs().getUploadTime();
 
+                            if (previousTime == null ||
+                                previousTime.trim().isEmpty) {
+                              addPostController.uploadAllPostFiles(
+                                  context: context,
+                                  isReel: widget.isReel ?? false,
+                                  audioId: widget.audioId,
+                                  audioStartTime: widget.audioStartTime,
+                                  audioEndTime: widget.audioEndTime,
+                                  items: widget.items,
+                                  title: descriptionText.text,
+                                  competitionId: widget.competitionId,
+                                  clubId: widget.clubId);
+                              await SharedPrefs()
+                                  .setUploadTime(DateTime.now().toString());
+                            } else {
+                              // Define the two times as strings
+                              String earlierTimeString = previousTime;
+
+                              // Parse the strings into DateTime objects
+                              DateTime earlierTime =
+                                  DateTime.parse(earlierTimeString);
+                              DateTime laterTime = DateTime.now();
+
+                              // Calculate the difference
+                              int differenceInMinutes = calculateTimeDifference(
+                                  earlierTime, laterTime);
+                              print("${differenceInMinutes} DIFFERENCE TIME");
+                              if (differenceInMinutes > 60) {
+                                await SharedPrefs()
+                                    .setUploadTime(DateTime.now().toString());
+                                addPostController.uploadAllPostFiles(
+                                    context: context,
+                                    isReel: widget.isReel ?? false,
+                                    audioId: widget.audioId,
+                                    audioStartTime: widget.audioStartTime,
+                                    audioEndTime: widget.audioEndTime,
+                                    items: widget.items,
+                                    title: descriptionText.text,
+                                    competitionId: widget.competitionId,
+                                    clubId: widget.clubId);
+                              } else {
+                                Get.snackbar("Alert",
+                                    "Please try to upload media after ${60 - differenceInMinutes} minutes.",
+                                    snackPosition: SnackPosition.BOTTOM,
+                                    colorText: AppColorConstants.whiteClr,
+                                    backgroundColor:
+                                        AppColorConstants.themeColor.darken(),
+                                    icon: Icon(Icons.error,
+                                        color: AppColorConstants.iconColor));
+                              }
+                            }
                           })
-                         
                         ],
                       ).hP16,
                       const SizedBox(
@@ -130,8 +181,7 @@ class AddPostState extends State<AddPostScreen> {
                                 child: Container(
                                   // height: 500,
                                   width: double.infinity,
-                                  color: AppColorConstants
-                                      .disabledColor
+                                  color: AppColorConstants.disabledColor
                                       .withOpacity(0.1),
                                   child: addPostController
                                           .currentHashtag.isNotEmpty
@@ -154,8 +204,7 @@ class AddPostState extends State<AddPostScreen> {
                           Container(
                             height: MediaQuery.of(context).size.height,
                             width: MediaQuery.of(context).size.width,
-                            color: AppColorConstants
-                                .backgroundColor
+                            color: AppColorConstants.backgroundColor
                                 .withOpacity(0.2),
                             child: mediaListView(isLarge: true),
                           ),
@@ -187,8 +236,7 @@ class AddPostState extends State<AddPostScreen> {
             items: [
               for (Media media in widget.items)
                 isLarge
-                    ?
-          Image.file(media.file!,
+                    ? Image.file(media.file!,
                         fit: BoxFit.cover, width: double.infinity)
                     : Image.memory(
                         media.thumbnail!,
@@ -236,7 +284,8 @@ class AddPostState extends State<AddPostScreen> {
           child: TextField(
             controller: descriptionText,
             textAlign: TextAlign.left,
-            style: TextStyle(fontSize: FontSizes.h5,color: AppColorConstants.grayscale900),
+            style: TextStyle(
+                fontSize: FontSizes.h5, color: AppColorConstants.grayscale900),
             maxLines: 5,
             onChanged: (text) {
               addPostController.textChanged(

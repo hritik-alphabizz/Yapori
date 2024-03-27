@@ -122,7 +122,7 @@ class UserModel {
   factory UserModel.fromJson(dynamic json) {
     UserModel model = UserModel();
     model.id = json['id'];
-    model.notifications = json['notifications'];
+    model.notifications = json['notifications'] ?? 0;
     model.name = json['name'];
     model.userName = json['username'] == null
         ? ''

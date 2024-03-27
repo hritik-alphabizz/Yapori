@@ -428,7 +428,7 @@ class LanguageStrings {
     "No Story found": "Hikaye bulunamadı",
     "Post some stories to create highlights":
         "Öne çıkanlar oluşturmak için bazı hikayeler yayınlayın",
-    "No Notification found": "Bildirim bulunamadı",
+    "Please wait a moment": "Bildirim bulunamadı",
     "Enter text here": "Yazıyı buraya girin",
     "Delete account": "Hesabı sil",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":
@@ -1043,7 +1043,7 @@ class LanguageStrings {
     "No Story found": "No Story found",
     "Post some stories to create highlights":
         "Post some stories to create highlights",
-    "No Notification found": "No Notification found",
+    "Please wait a moment": "Please wait a moment",
     "Enter text here": "Enter text here",
     "Delete account": "Delete account",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":
@@ -1655,7 +1655,7 @@ class LanguageStrings {
     "No Story found": "لم يتم العثور على قصة",
     "Post some stories to create highlights":
         "انشر بعض القصص لإنشاء أبرز الأحداث",
-    "No Notification found": "لم يتم العثور على إشعار",
+    "Please wait a moment": "لم يتم العثور على إشعار",
     "Enter text here": "أدخل النص هنا",
     "Delete account": "حذف الحساب",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":
@@ -2268,7 +2268,7 @@ class LanguageStrings {
     "No Story found": "कोई कहानी नहीं मिली",
     "Post some stories to create highlights":
         "हाइलाइट बनाने के लिए कुछ कहानियाँ पोस्ट करें",
-    "No Notification found": "कोई अधिसूचना नहीं मिली",
+    "Please wait a moment": "कोई अधिसूचना नहीं मिली",
     "Enter text here": "पाठ यहां लिखें",
     "Delete account": "खाता हटा दो",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":
@@ -2890,7 +2890,7 @@ class LanguageStrings {
     "No Story found": "История не найдена",
     "Post some stories to create highlights":
         "Опубликуйте несколько историй, чтобы выделить их",
-    "No Notification found": "Уведомление не найдено",
+    "Please wait a moment": "Уведомление не найдено",
     "Enter text here": "Введите текст здесь",
     "Delete account": "Удалить аккаунт",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":
@@ -3515,7 +3515,7 @@ class LanguageStrings {
     "No Story found": "No se encontró ninguna historia",
     "Post some stories to create highlights":
         "Publica algunas historias para crear destacados.",
-    "No Notification found": "No se encontró ninguna notificación",
+    "Please wait a moment": "No se encontró ninguna notificación",
     "Enter text here": "Introducir texto aquí",
     "Delete account": "Borrar cuenta",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":
@@ -4143,7 +4143,7 @@ class LanguageStrings {
     "No Story found": "Aucune histoire trouvée",
     "Post some stories to create highlights":
         "Publiez des histoires pour créer des moments forts",
-    "No Notification found": "Aucune notification trouvée",
+    "Please wait a moment": "Aucune notification trouvée",
     "Enter text here": "Entrez le texte ici",
     "Delete account": "Supprimer le compte",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":
@@ -4767,7 +4767,7 @@ class LanguageStrings {
     "No Story found": "Nenhuma História encontrada",
     "Post some stories to create highlights":
         "Publique algumas Histórias para criar destaques",
-    "No Notification found": "Nenhuma Notificação encontrada",
+    "Please wait a moment": "Nenhuma Notificação encontrada",
     "Enter text here": "Digite o texto aqui",
     "Delete account": "Excluir conta",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":
@@ -5387,7 +5387,7 @@ class LanguageStrings {
     "No Story found": "ไม่พบเรื่องราว",
     "Post some stories to create highlights":
         "โพสต์เรื่องราวบางส่วนเพื่อสร้างไฮไลต์",
-    "No Notification found": "ไม่พบการแจ้งเตือน",
+    "Please wait a moment": "ไม่พบการแจ้งเตือน",
     "Enter text here": "ป้อนข้อความที่นี่",
     "Delete account": "ลบบัญชี",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":
@@ -6011,7 +6011,7 @@ class LanguageStrings {
     "No Story found": "Keine Geschichte gefunden",
     "Post some stories to create highlights":
         "Veröffentlichen Sie einige Geschichten, um Highlights zu erstellen",
-    "No Notification found": "Keine Benachrichtigung gefunden",
+    "Please wait a moment": "Keine Benachrichtigung gefunden",
     "Enter text here": "Geben Sie hier Text ein",
     "Delete account": "Konto löschen",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":
@@ -6617,7 +6617,7 @@ class LanguageStrings {
     "No call found": "通話が見つかりません",
     "No Story found": "ストーリーが見つかりません",
     "Post some stories to create highlights": "ハイライトを作成するためにいくつかのストーリーを投稿",
-    "No Notification found": "通知が見つかりません",
+    "Please wait a moment": "通知が見つかりません",
     "Enter text here": "ここにテキストを入力",
     "Delete account": "アカウントを削除",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":
@@ -7216,7 +7216,7 @@ class LanguageStrings {
     "No Story found": "কোন গল্প খুঁজে পাওয়া গিয়েনি",
     "Post some stories to create highlights":
         "হাইলাইট তৈরি করতে কিছু গল্প পোস্ট করুন",
-    "No Notification found": "কোন বিজ্ঞপ্তি খুঁজে পাওয়া গিয়েনি",
+    "Please wait a moment": "কোন বিজ্ঞপ্তি খুঁজে পাওয়া গিয়েনি",
     "Enter text here": "এখানে টেক্সট লিখুন",
     "Delete account": "অ্যাকাউন্ট মুছে ফেলুন",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":
@@ -7835,7 +7835,7 @@ class LanguageStrings {
     "No Story found": "Nessuna storia trovata",
     "Post some stories to create highlights":
         "Pubblica alcune storie per creare momenti salienti",
-    "No Notification found": "Nessuna notifica trovata",
+    "Please wait a moment": "Nessuna notifica trovata",
     "Enter text here": "Inserisci il testo qui",
     "Delete account": "Cancella account",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":
@@ -8438,7 +8438,7 @@ class LanguageStrings {
     "No call found": "통화를 찾을 수 없음",
     "No Story found": "스토리를 찾을 수 없음",
     "Post some stories to create highlights": "하이라이트를 만들려면 몇 가지 스토리를 게시하세요",
-    "No Notification found": "알림을 찾을 수 없음",
+    "Please wait a moment": "알림을 찾을 수 없음",
     "Enter text here": "여기에 텍스트 입력",
     "Delete account": "계정 삭제",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":
@@ -9039,7 +9039,7 @@ class LanguageStrings {
     "No Story found": "Tidak ada cerita ditemukan",
     "Post some stories to create highlights":
         "Kirim beberapa cerita untuk membuat sorotan",
-    "No Notification found": "Tidak ada notifikasi ditemukan",
+    "Please wait a moment": "Tidak ada notifikasi ditemukan",
     "Enter text here": "Masukkan teks di sini",
     "Delete account": "Hapus akun",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":
@@ -9673,7 +9673,7 @@ class LanguageStrings {
     "No Story found": "Walang natagpuang kwento",
     "Post some stories to create highlights":
         "Mag-post ng mga kwento para makalikha ng mga tampok",
-    "No Notification found": "Walang natagpuang Abiso",
+    "Please wait a moment": "Walang natagpuang Abiso",
     "Enter text here": "Maglagay ng teksto dito",
     "Delete account": "Tanggalin ang account",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":
@@ -10272,7 +10272,7 @@ class LanguageStrings {
     "No call found": "未找到通话",
     "No Story found": "未找到故事",
     "Post some stories to create highlights": "发布一些故事以创建亮点",
-    "No Notification found": "未找到通知",
+    "Please wait a moment": "未找到通知",
     "Enter text here": "在此输入文本",
     "Delete account": "删除账户",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":
@@ -10868,7 +10868,7 @@ class LanguageStrings {
     "No Story found": "Không tìm thấy câu chuyện",
     "Post some stories to create highlights":
         "Đăng một số câu chuyện để tạo nổi bật",
-    "No Notification found": "Không tìm thấy thông báo",
+    "Please wait a moment": "Không tìm thấy thông báo",
     "Enter text here": "Nhập văn bản vào đây",
     "Delete account": "Xóa tài khoản",
     "Are you sure to delete account, Once account is deleted your all data will be deleted":

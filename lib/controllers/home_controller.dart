@@ -30,6 +30,7 @@ import 'package:http/http.dart' as http;
 class HomeController extends GetxController {
   final SettingsController _settingsController = Get.find();
   final UserProfileManager _userProfileManager = Get.find();
+  RxBool isLoading = true.obs;
 
   RxList<PostModel> posts = <PostModel>[].obs;
   List<Ads> ads = [];
@@ -290,6 +291,9 @@ class HomeController extends GetxController {
       AppUtil.checkInternet().then((value) async {
         print('working !! $_postsCurrentPage');
         if (value) {
+          isLoading = true.obs;
+
+          update();
           ApiController()
               .getPosts(
                   userId: postSearchQuery.userId,
@@ -323,6 +327,8 @@ class HomeController extends GetxController {
                     .where((element) => element.gallery.isNotEmpty)
                     .toList()
                 : []);
+            isLoading = false.obs;
+
             update();
 
             ads.addAll(response.success
@@ -564,8 +570,12 @@ class HomeController extends GetxController {
 
         stories.add(story);
         stories.addAll(responses[1] as List<StoryModel>);
+        try {
+          print(stories.first.media.first.video.toString() + "VIDEO URRLLLL");
+        } catch (stacktrace) {
+          print(stacktrace.toString() + "VIDEO URRLLLL");
+        }
 
-        print(stories.first.media.first.video.toString() + "VIDEO URRLLLL");
         liveUsers.value = responses[2] as List<UserModel>;
       }
 

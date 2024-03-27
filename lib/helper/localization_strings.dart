@@ -606,7 +606,7 @@ class LocalizationString {
   static String noStoryFound = 'No Story found'.tr;
   static String postSomeStories = 'Post some stories to create highlights'.tr;
 
-  static String noNotificationFound = 'No Notification found'.tr;
+  static String noNotificationFound = 'Please wait a moment'.tr;
 
   static String enterTextHere = 'Enter text here'.tr;
   static String deleteAccount = 'Delete account'.tr;

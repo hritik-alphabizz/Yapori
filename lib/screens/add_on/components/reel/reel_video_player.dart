@@ -1,3 +1,124 @@
+// import 'dart:async';
+// import 'package:flutter/material.dart';
+// import 'package:foap/model/post_model.dart';
+// import 'package:video_player/video_player.dart';
+// import 'package:chewie/chewie.dart';
+
+// class ReelVideoPlayer extends StatefulWidget {
+//   final List<String>? videoUrls;
+
+//   const ReelVideoPlayer({
+//     Key? key,
+//     this.videoUrls,
+//     required PostModel reel,
+//   }) : super(key: key);
+
+//   @override
+//   State<ReelVideoPlayer> createState() => _ReelVideoPlayerState();
+// }
+
+// class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
+//   late Future<void> initializeVideoPlayerFuture;
+//   VideoPlayerController? videoPlayerController;
+//   ChewieController? chewieController;
+//   int currentVideoIndex = 0;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     if (widget.videoUrls != null && widget.videoUrls!.isNotEmpty) {
+//       prepareVideo(url: widget.videoUrls![currentVideoIndex]);
+//     }
+//   }
+
+//   @override
+//   void dispose() {
+//     clear();
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return GestureDetector(
+//       onTap: () {
+//         // Handle tap event if needed
+//       },
+//       child: Stack(
+//         children: [
+//           FutureBuilder(
+//             future: initializeVideoPlayerFuture,
+//             builder: (context, snapshot) {
+//               if (snapshot.connectionState == ConnectionState.done) {
+//                 return SizedBox(
+//                   key: PageStorageKey(
+//                       widget.videoUrls?[currentVideoIndex] ?? ''),
+//                   child: Chewie(
+//                     key: PageStorageKey(
+//                         widget.videoUrls?[currentVideoIndex] ?? ''),
+//                     controller: chewieController!,
+//                   ),
+//                 );
+//               } else {
+//                 return const Center(
+//                   child: CircularProgressIndicator(),
+//                 );
+//               }
+//             },
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   void prepareVideo({required String url}) {
+//     if (videoPlayerController != null) {
+//       videoPlayerController!.pause();
+//     }
+
+//     videoPlayerController = VideoPlayerController.network(url);
+//     chewieController = ChewieController(
+//       videoPlayerController: videoPlayerController!,
+//       autoInitialize: true,
+//       looping: false,
+//       autoPlay: true,
+//       errorBuilder: (context, errorMessage) {
+//         return Center(
+//           child: Text(
+//             errorMessage,
+//             style: const TextStyle(color: Colors.white),
+//           ),
+//         );
+//       },
+//     );
+
+//     initializeVideoPlayerFuture = videoPlayerController!.initialize().then((_) {
+//       setState(() {});
+//       videoPlayerController!.addListener(videoCompletionListener);
+//     });
+//   }
+
+//   void videoCompletionListener() {
+//     if (videoPlayerController!.value.position ==
+//         videoPlayerController!.value.duration) {
+//       // Video completed, switch to the next video
+//       videoPlayerController!.seekTo(Duration.zero);
+//       currentVideoIndex =
+//           (currentVideoIndex + 1) % (widget.videoUrls?.length ?? 0);
+//       if (widget.videoUrls != null && widget.videoUrls!.isNotEmpty) {
+//         prepareVideo(url: widget.videoUrls![currentVideoIndex]);
+//       }
+//     }
+//   }
+
+//   void clear() {
+//     videoPlayerController!.pause();
+//     videoPlayerController!.dispose();
+//     chewieController!.dispose();
+//   }
+// }
+
+import 'dart:async';
+
 import 'package:chewie/chewie.dart';
 import 'package:flutter_emoji_feedback/flutter_emoji_feedback.dart';
 import 'package:foap/components/post_card_controller.dart';
@@ -58,12 +179,13 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
     return res;
   }
 
+  int tapCount = 0;
+  Timer? doubleTapTimer;
   @override
   void initState() {
     super.initState();
     // playVideo = widget.play;
     prepareVideo(url: widget.reel.gallery.first.filePath);
-    _profileController.getMyProfile();
   }
 
   @override
@@ -153,372 +275,419 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
     setState(() {
       enableFollowButton = isUserFollower();
     });
-    return Stack(
-      children: [
-        FutureBuilder(
-          future: initializeVideoPlayerFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return SizedBox(
-                key: PageStorageKey(widget.reel.gallery.first.filePath),
-                child: Chewie(
+    return GestureDetector(
+      onTap: () {
+        tapCount++;
+        if (doubleTapTimer != null && doubleTapTimer!.isActive) {
+          // Double-tap detected
+          doubleTapTimer!.cancel();
+          tapCount = 0;
+          _reelsController.likeUnlikeReel(post: widget.reel, context: context);
+        } else {
+          doubleTapTimer = Timer(const Duration(milliseconds: 300), () {
+            // Timeout for double-tap
+            tapCount = 0;
+          });
+        }
+      },
+      child: Stack(
+        children: [
+          FutureBuilder(
+            future: initializeVideoPlayerFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return SizedBox(
                   key: PageStorageKey(widget.reel.gallery.first.filePath),
-                  controller: ChewieController(
-                    allowFullScreen: true,
-                    videoPlayerController: videoPlayerController!,
-                    aspectRatio: Get.width / (Get.height - 80),
-                    showOptions: false,
-                    showControls: false,
-                    autoInitialize: true,
-                    looping: false,
-                    autoPlay: false,
+                  child: Chewie(
+                    key: PageStorageKey(widget.reel.gallery.first.filePath),
+                    controller: ChewieController(
+                      allowFullScreen: true,
+                      videoPlayerController: videoPlayerController!,
+                      aspectRatio: null,
+                      showOptions: false,
+                      showControls: false,
+                      autoInitialize: true,
+                      looping: false,
+                      autoPlay: false,
 
-                    // allowMuting: true,
-                    errorBuilder: (context, errorMessage) {
-                      return Center(
-                        child: Text(
-                          errorMessage,
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              );
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          },
-        ),
-        Positioned(
-            bottom: 25,
-            left: 16,
-            right: 60,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    UserAvatarView(
-                      size: 25,
-                      user: widget.reel.user,
-                      hideOnlineIndicator: true,
-                    ).ripple(() {
-                      openProfile();
-                    }),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    BodyLargeText(
-                      widget.reel.user.userName,
-                      weight: TextWeight.medium,
-                      color: AppColorConstants.whiteClr,
-                    ).ripple(() {
-                      openProfile();
-                    }),
-                    widget.reel.user.isVerified == false
-                        ? const SizedBox.shrink()
-                        : Image.asset(
-                            'assets/verified.png',
-                            height: 15,
-                            width: 15,
+                      // allowMuting: true,
+                      errorBuilder: (context, errorMessage) {
+                        return Center(
+                          child: Text(
+                            errorMessage,
+                            style: const TextStyle(color: Colors.white),
                           ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0, left: 10),
-                      child: CachedNetworkImage(
-                        imageUrl:
-                            'https://yapori.in/backend/web/flags/${widget.reel.user.country.toString().toLowerCase().replaceAll(' ', '-')}.jpg',
-                        fit: BoxFit.cover,
-                        height: 20,
-                        width: 30,
-                        placeholder: (context, url) => SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: const CircularProgressIndicator().p16),
-                        errorWidget: (context, url, error) => SizedBox(
-                            height: 20,
-                            width: 30,
-                            child: Icon(
-                              Icons.error,
-                              size: 30 / 2,
-                              color: AppColorConstants.iconColor,
-                            )),
-                      ),
+                        );
+                      },
                     ),
-
-                    // if (widget.reel.user.isMe == false)
-                    // // widget.model.user.isFollower == false ?
-                    // // getFollowButton(),
-                    // //     == true ?
-                    widget.reel.user.isMe == false
-                        ? enableFollowButton == false &&
-                                followButtonPressed == false
-                            ? Padding(
-                                padding: const EdgeInsets.only(left: 10.0),
-                                child: SizedBox(
-                                    height: 25,
-                                    // width: 80,
-                                    child: AppThemeBorderButton(
-                                        // icon: ThemeIcon.message,
-                                        text:
-                                            widget.reel.user.isFollower == true
-                                                ? LocalizationString.followBack
-                                                : LocalizationString.follow,
-                                        borderColor:
-                                            AppColorConstants.themeColor,
-                                        textStyle: TextStyle(
-                                            fontSize: FontSizes.b4,
-                                            fontWeight: TextWeight.medium,
-                                            color:
-                                                AppColorConstants.themeColor),
-                                        onPress: () async {
-                                          print(
-                                              "onPress enableFollowButton : $enableFollowButton");
-                                          setState(() {
-                                            enableFollowButton = false;
-                                            followButtonPressed = true;
-                                            // commentAndLikeWidget(widget.reel.user.id);
-                                          });
-                                          await exploreController
-                                              .followUser(widget.reel.user)
-                                              .then((res) {
-                                            // loadData();
-                                            _reelsController.getReels();
-
-                                            setState(() {});
-                                          });
-                                        })),
-                              )
-                            : const SizedBox.shrink()
-                        : const SizedBox.shrink(),
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                if (widget.reel.title.isNotEmpty)
-                  Column(
+                  ),
+                );
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            },
+          ),
+          Positioned(
+              bottom: 50,
+              left: 16,
+              right: 60,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      BodyLargeText(
-                        widget.reel.title,
-                        weight: TextWeight.medium,
-                        color: AppColorConstants.whiteClr,
-                      ),
+                      UserAvatarView(
+                        size: 25,
+                        user: widget.reel.user,
+                        hideOnlineIndicator: true,
+                      ).ripple(() {
+                        openProfile();
+                      }),
                       const SizedBox(
-                        height: 10,
+                        width: 10,
                       ),
+                      BodyLargeText(
+                        widget.reel.user.userName,
+                        weight: TextWeight.bold,
+                        color: AppColorConstants.reelColor,
+                      ).ripple(() {
+                        openProfile();
+                      }),
+                      widget.reel.user.isVerified == false
+                          ? const SizedBox.shrink()
+                          : Image.asset(
+                              'assets/verified.png',
+                              height: 15,
+                              width: 15,
+                            ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0, left: 10),
+                        child: CachedNetworkImage(
+                          imageUrl:
+                              'https://yapori.in/backend/web/flags/${widget.reel.user.country.toString().toLowerCase().replaceAll(' ', '-')}.jpg',
+                          fit: BoxFit.cover,
+                          height: 20,
+                          width: 30,
+                          placeholder: (context, url) => SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: const CircularProgressIndicator().p16),
+                          errorWidget: (context, url, error) => SizedBox(
+                              height: 20,
+                              width: 30,
+                              child: Icon(
+                                Icons.error,
+                                size: 30 / 2,
+                                color: AppColorConstants.iconColor,
+                              )),
+                        ),
+                      ),
+
+                      // if (widget.reel.user.isMe == false)
+                      // // widget.model.user.isFollower == false ?
+                      // // getFollowButton(),
+                      // //     == true ?
+                      widget.reel.user.isMe == false
+                          ? enableFollowButton == false &&
+                                  followButtonPressed == false
+                              ? Padding(
+                                  padding: const EdgeInsets.only(left: 10.0),
+                                  child: SizedBox(
+                                      height: 25,
+                                      // width: 80,
+                                      child: AppThemeBorderButton(
+                                          // icon: ThemeIcon.message,
+                                          text: widget.reel.user.isFollower ==
+                                                  true
+                                              ? LocalizationString.followBack
+                                              : LocalizationString.follow,
+                                          borderColor:
+                                              AppColorConstants.themeColor,
+                                          textStyle: TextStyle(
+                                              fontSize: FontSizes.b4,
+                                              fontWeight: TextWeight.medium,
+                                              color:
+                                                  AppColorConstants.themeColor),
+                                          onPress: () async {
+                                            print(
+                                                "onPress enableFollowButton : $enableFollowButton");
+                                            setState(() {
+                                              enableFollowButton = false;
+                                              followButtonPressed = true;
+                                              // commentAndLikeWidget(widget.reel.user.id);
+                                            });
+                                            await exploreController
+                                                .followUser(widget.reel.user)
+                                                .then((res) {
+                                              // loadData();
+                                              _reelsController.getReels();
+
+                                              setState(() {});
+                                            });
+                                          })),
+                                )
+                              : const SizedBox.shrink()
+                          : const SizedBox.shrink(),
                     ],
                   ),
-                SizedBox(
-                    width: Get.width * 0.5,
-                    height: 25,
-                    child: Row(
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  if (widget.reel.title.isNotEmpty)
+                    Column(
+                      children: [
+                        BodyLargeText(
+                          widget.reel.title,
+                          weight: TextWeight.medium,
+                          color: AppColorConstants.reelColor,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    ),
+                  SizedBox(
+                      width: Get.width * 0.5,
+                      height: 25,
+                      child: Row(
+                        children: [
+                          ThemeIconWidget(
+                            ThemeIcon.music,
+                            size: 15,
+                            color: AppColorConstants.reelColor,
+                          ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Expanded(
+                            // width: Get.width * 0.5,
+                            child: BodyMediumText(
+                              widget.reel.audio == null
+                                  ? LocalizationString.originalAudio
+                                  : widget.reel.audio!.name,
+                              weight: TextWeight.medium,
+                              color: AppColorConstants.reelColor,
+                            ),
+                          ),
+                        ],
+                      ).ripple(() {
+                        if (widget.reel.audio != null) {
+                          Get.to(() => ReelAudioDetail(
+                                audio: widget.reel.audio!,
+                              ));
+                        }
+                      })),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 5.0),
+                    child: BodyMediumText(
+                      '${widget.reel.totalView} ${LocalizationString.views}',
+                      color: AppColorConstants.reelColor,
+                      fSize: 12,
+                    ),
+                  )
+                ],
+              )),
+          Positioned(
+              bottom: 180,
+              right: 16,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    children: [
+                      Obx(() => Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              // Add your decoration properties here
+                              borderRadius: BorderRadius.circular(8.0),
+                              color:
+                                  Colors.black.withOpacity(.4), // Example color
+                            ),
+                            child: InkWell(
+                                onLongPress: () {
+                                  setState(() {
+                                    showReact = !showReact;
+                                  });
+
+                                  Future.delayed(const Duration(seconds: 1),
+                                      () {
+                                    setState(() {
+                                      showReact = false;
+                                    });
+                                  });
+                                },
+                                onTap: () {
+                                  _reelsController.likeUnlikeReel(
+                                      post: widget.reel, context: context);
+                                  // widget.likeTapHandler();
+                                },
+                                child: ThemeIconWidget(
+                                  _reelsController.likedReels
+                                              .contains(widget.reel) ||
+                                          widget.reel.isLike
+                                      ? ThemeIcon.favFilled
+                                      : ThemeIcon.fav,
+                                  color: _reelsController.likedReels
+                                              .contains(widget.reel) ||
+                                          widget.reel.isLike
+                                      ? AppColorConstants.red
+                                      :
+                                      //AppColorConstants.iconColor
+                                      AppColorConstants.whiteClr,
+                                )),
+                          )),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      // Obx(() {
+                      // int totalLikes = 0;
+                      // if (_reelsController.likedReels.contains(widget.reel)) {
+                      //   PostModel post = _reelsController.likedReels
+                      //       .where((e) => e.id == widget.reel.id)
+                      //       .first;
+                      //   // totalLikes = post.totalLike;
+                      // } else {
+                      //   // totalLikes = widget.reel.totalLike;
+                      // }
+                      BodyMediumText(
+                        '${widget.reel.totalLike}',
+                        color: AppColorConstants.whiteClr,
+                      ),
+
+                      // }),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      // Add your decoration properties here
+                      borderRadius: BorderRadius.circular(8.0),
+                      color: Colors.black.withOpacity(0.4), // Example color
+                    ),
+                    child: Column(
                       children: [
                         ThemeIconWidget(
-                          ThemeIcon.music,
-                          size: 15,
+                          ThemeIcon.message,
+                          size: 25,
                           color: AppColorConstants.whiteClr,
                         ),
                         const SizedBox(
-                          width: 8,
+                          height: 5,
                         ),
-                        Expanded(
-                          // width: Get.width * 0.5,
-                          child: BodyMediumText(
-                            widget.reel.audio == null
-                                ? LocalizationString.originalAudio
-                                : widget.reel.audio!.name,
-                            weight: TextWeight.medium,
-                            color: AppColorConstants.whiteClr,
-                          ),
-                        ),
+                        BodyMediumText(
+                          widget.reel.totalComment.formatNumber,
+                          color: AppColorConstants.whiteClr,
+                        )
                       ],
                     ).ripple(() {
-                      if (widget.reel.audio != null) {
-                        Get.to(() => ReelAudioDetail(
-                              audio: widget.reel.audio!,
-                            ));
-                      }
-                    })),
-                Padding(
-                  padding: const EdgeInsets.only(left: 5.0),
-                  child: BodyMediumText(
-                    '${widget.reel.totalView} ${LocalizationString.views}',
-                    color: AppColorConstants.whiteClr,
-                    fSize: 12,
+                      openComments();
+                    }),
                   ),
-                )
-              ],
-            )),
-        Positioned(
-            bottom: 180,
-            right: 16,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  children: [
-                    Obx(() => InkWell(
-                        onLongPress: () {
-                          setState(() {
-                            showReact = !showReact;
-                          });
-
-                          Future.delayed(const Duration(seconds: 3), () {
-                            setState(() {
-                              showReact = false;
-                            });
-                          });
-                        },
-                        onTap: () {
-                          _reelsController.likeUnlikeReel(
-                              post: widget.reel, context: context);
-                          // widget.likeTapHandler();
-                        },
-                        child: ThemeIconWidget(
-                          _reelsController.likedReels.contains(widget.reel) ||
-                                  widget.reel.isLike
-                              ? ThemeIcon.favFilled
-                              : ThemeIcon.fav,
-                          color: _reelsController.likedReels
-                                      .contains(widget.reel) ||
-                                  widget.reel.isLike
-                              ? AppColorConstants.red
-                              :
-                              //AppColorConstants.iconColor
-                              AppColorConstants.whiteClr,
-                        ))),
-                    const SizedBox(
-                      height: 5,
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  // const ThemeIconWidget(
+                  //   ThemeIcon.send,
+                  //   size: 20,
+                  // ),
+                  // const SizedBox(
+                  //   height: 20,
+                  // ),
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      // Add your decoration properties here
+                      borderRadius: BorderRadius.circular(8.0),
+                      color: Colors.black.withOpacity(0.4), // Example color
                     ),
-                    // Obx(() {
-                    // int totalLikes = 0;
-                    // if (_reelsController.likedReels.contains(widget.reel)) {
-                    //   PostModel post = _reelsController.likedReels
-                    //       .where((e) => e.id == widget.reel.id)
-                    //       .first;
-                    //   // totalLikes = post.totalLike;
-                    // } else {
-                    //   // totalLikes = widget.reel.totalLike;
-                    // }
-                    BodyMediumText(
-                      '${widget.reel.totalLike}',
-                      color: AppColorConstants.whiteClr,
-                    ),
-
-                    // }),
-                  ],
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Column(
-                  children: [
-                    ThemeIconWidget(
-                      ThemeIcon.message,
+                    child: Icon(
+                      Icons.share,
                       size: 25,
                       color: AppColorConstants.whiteClr,
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    BodyMediumText(
-                      widget.reel.totalComment.formatNumber,
-                      color: AppColorConstants.whiteClr,
-                    )
-                  ],
-                ).ripple(() {
-                  openComments();
-                }),
-                const SizedBox(
-                  height: 20,
-                ),
-                // const ThemeIconWidget(
-                //   ThemeIcon.send,
-                //   size: 20,
-                // ),
-                // const SizedBox(
-                //   height: 20,
-                // ),
-                ThemeIconWidget(
-                  ThemeIcon.share,
-                  color: AppColorConstants.whiteClr,
-                ).ripple(() {
-                  showModalBottomSheet(
-                      backgroundColor: Colors.transparent,
-                      context: context,
-                      builder: (context) =>
-                          SelectFollowingUserForMessageSending(
-                              post: widget.reel.gallery[0],
-                              sendToUserCallback: (user) {
-                                selectUserForChatController.sendMessage(
-                                    toUser: user, post: widget.reel);
-                              },
-                              show: true,
-                              isClips: true));
-                }),
-                if (widget.reel.audio != null)
-                  CachedNetworkImage(
-                          height: 25,
-                          width: 25,
-                          imageUrl: widget.reel.audio!.thumbnail)
-                      .borderWithRadius(value: 1, radius: 5)
-                      .ripple(() {
-                    if (widget.reel.audio != null) {
-                      Get.to(() => ReelAudioDetail(audio: widget.reel.audio!));
-                    }
-                  })
-              ],
-            )),
-        Positioned(
-          bottom: 250,
-          child: showReact
-              ? Container(
-                  // color: AppColorConstants.whiteClr.withOpacity(0.7),
-                  // height: 80,
-                  width: MediaQuery.of(context).size.width,
-                  child: EmojiFeedback(
-                    showLabel: false,
-                    // emojiPreset: [],
-                    animDuration: const Duration(milliseconds: 300),
-                    curve: Curves.bounceIn,
-                    inactiveElementScale: .7,
-                    elementSize: 32,
-                    inactiveElementBlendColor: Colors.white,
-                    onChanged: (value) {
-                      String emoji = '';
-                      if (value == 1) {
-                        emoji = '😖';
-                      } else if (value == 2) {
-                        emoji = '😞';
-                      } else if (value == 3) {
-                        emoji = '🙂';
-                      } else if (value == 4) {
-                        emoji = '😄';
-                      } else {
-                        emoji = '😍';
+                    ).ripple(() {
+                      showModalBottomSheet(
+                        backgroundColor: Colors.transparent,
+                        context: context,
+                        builder: (context) =>
+                            SelectFollowingUserForMessageSending(
+                          post: widget.reel.gallery[0],
+                          sendToUserCallback: (user) {
+                            selectUserForChatController.sendMessage(
+                                toUser: user, post: widget.reel);
+                          },
+                          show: true,
+                          isClips: true,
+                        ),
+                      );
+                    }),
+                  ),
+                  if (widget.reel.audio != null)
+                    CachedNetworkImage(
+                            height: 25,
+                            width: 25,
+                            imageUrl: widget.reel.audio!.thumbnail)
+                        .borderWithRadius(value: 1, radius: 5)
+                        .ripple(() {
+                      if (widget.reel.audio != null) {
+                        Get.to(
+                            () => ReelAudioDetail(audio: widget.reel.audio!));
                       }
-                      print('this is emoji feedback val $value');
-                      postCardController.reactOnPost(
-                          post: widget.reel,
-                          context: context,
-                          emoji: emoji.toString());
-                      // postCardController.likeUnlikePost(
-                      //     post: widget.model, context: context);
-                      Future.delayed(const Duration(seconds: 2), () {
-                        setState(() {
-                          showReact = false;
+                    })
+                ],
+              )),
+          Positioned(
+            bottom: 250,
+            child: showReact
+                ? Container(
+                    // color: AppColorConstants.whiteClr.withOpacity(0.7),
+                    // height: 80,
+                    width: MediaQuery.of(context).size.width,
+                    child: EmojiFeedback(
+                      showLabel: false,
+                      // emojiPreset: [],
+                      animDuration: const Duration(milliseconds: 300),
+                      curve: Curves.bounceIn,
+                      inactiveElementScale: .7,
+                      elementSize: 32,
+                      inactiveElementBlendColor: Colors.white,
+                      onChanged: (value) {
+                        String emoji = '';
+                        if (value == 1) {
+                          emoji = '😖';
+                        } else if (value == 2) {
+                          emoji = '😞';
+                        } else if (value == 3) {
+                          emoji = '🙂';
+                        } else if (value == 4) {
+                          emoji = '😄';
+                        } else {
+                          emoji = '😍';
+                        }
+                        print('this is emoji feedback val $value');
+                        postCardController.reactOnPost(
+                            post: widget.reel,
+                            context: context,
+                            emoji: emoji.toString());
+                        // postCardController.likeUnlikePost(
+                        //     post: widget.model, context: context);
+                        Future.delayed(const Duration(seconds: 2), () {
+                          setState(() {
+                            showReact = false;
+                          });
                         });
-                      });
 
-                      print(value);
-                    },
-                  ))
-              : const SizedBox.shrink(),
-        ),
-      ],
+                        print(value);
+                      },
+                    ))
+                : const SizedBox.shrink(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -538,7 +707,14 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
         pause();
       }
     });
-
+    videoPlayerController!.addListener(() {
+      if (videoPlayerController!.value.position ==
+          videoPlayerController!.value.duration) {
+        // Video completed, restart it
+        videoPlayerController!.seekTo(Duration.zero);
+        play();
+      }
+    });
     // videoPlayerController!.addListener(checkVideoProgress);
   }
 

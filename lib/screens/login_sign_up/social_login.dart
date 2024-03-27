@@ -17,6 +17,7 @@ import '../dashboard/dashboard_screen.dart';
 import '../settings_menu/settings_controller.dart';
 
 /// Returns the sha256 hash of [input] in hex notation.
+///
 String sha256ofString(String input) {
   final bytes = utf8.encode(input);
   final digest = sha256.convert(bytes);
@@ -62,45 +63,76 @@ class _SocialLoginState extends State<SocialLogin> {
       children: [
         widget.hidePhoneLogin == false
             ? Container(
-                height: 40,
-                width: 40,
-                color: AppColorConstants.themeColor.withOpacity(0.2),
-                child: Center(
-                    child: Image.asset(
-                  'assets/phone.png',
-                  height: 20,
-                  width: 20,
-                  color: Colors.white,
-                ))).circular.ripple(() {
-                Get.offAll(() => const PhoneLoginScreen());
-              })
+                // height: 40,
+                // width: 40,
+                // color: AppColorConstants.themeColor.withOpacity(0.2),
+                // child: Center(
+                //     child: Image.asset(
+                //   'assets/phone.png',
+                //   height: 20,
+                //   width: 20,
+                //   color: Colors.white,
+                // ))).circular.ripple(() {
+                // Get.offAll(
+                //   () => const PhoneLoginScreen(),
+                // );
+                // }
+                )
             : Container(
-                height: 40,
-                width: 40,
+                height: 80,
+                width: 80,
                 color: AppColorConstants.themeColor.withOpacity(0.2),
                 child: Center(
                     child: Image.asset(
                   'assets/email.png',
-                  height: 20,
-                  width: 20,
+                  height: 60,
+                  width: 60,
                   color: Colors.white,
                 ))).circular.ripple(() {
                 Get.offAll(() => const LoginScreen());
               }),
-        const SizedBox(width: 15,),
-        Container(
-            height: 40,
-            width: 40,
-            color: AppColorConstants.themeColor.withOpacity(0.2),
-            child: Center(
-                child: Image.asset(
-              'assets/google.png',
-              height: 20,
-              width: 20,
-            ))).circular.ripple(() {
-          signInWithGoogle();
+        const SizedBox(
+          width: 1,
+        ),
+        GestureDetector(
+          onTap: signInWithGoogle,
+          child: Container(
+            height: 66,
+            width: 265, // Adjust width according to your design
+            decoration: BoxDecoration(
+              color: AppColorConstants.themeColor.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(
+                  40), // Half of the height for a circular shape
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.login, // Placeholder for signing icon
+                  size: 40,
+                  color: Colors.teal,
+                ),
+                SizedBox(
+                    width: 10), // Adjust spacing between signing icon and text
+                Text(
+                  'Login with Google',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.teal,
+                  ),
+                ),
+                SizedBox(width: 8), // Adjust spacing between text and icon
+                Image.asset(
+                  'assets/google.png',
+                  height: 32, // Adjust height as needed
+                  width: 32, // Adjust width as needed
+                ),
+              ],
+            ),
+          ),
+        ),
 
-        }),
         Platform.isIOS
             ? Container(
                 height: 40,
@@ -139,8 +171,7 @@ class _SocialLoginState extends State<SocialLogin> {
       print('this is social response ${res!.email}');
     } catch (error) {
       print('this is social response $error');
-      AppUtil.showToast(
-          message: error.toString(), isSuccess: false);
+      AppUtil.showToast(message: error.toString(), isSuccess: false);
     }
   }
 

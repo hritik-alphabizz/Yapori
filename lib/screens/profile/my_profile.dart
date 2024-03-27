@@ -81,12 +81,11 @@ class MyProfileState extends State<MyProfile> {
                     const SizedBox(height: 20),
                   if (_settingsController.setting.value!.enableHighlights)
                     // addHighlightsView(),
-                  const SizedBox(height: 40),
+                    const SizedBox(height: 40),
                   segmentView(),
                   Obx(() => _profileController.selectedSegment.value == 1
                       ? addReelsGrid()
                       : addPhotoGrid()),
-
                   const SizedBox(height: 50),
                 ],
               ),
@@ -105,8 +104,7 @@ class MyProfileState extends State<MyProfile> {
                 ? Stack(
                     children: [
                       _profileController.user.value!.coverImage != null
-                          ?
-                      CachedNetworkImage(
+                          ? CachedNetworkImage(
                                   width: Get.width,
                                   height: 225,
                                   fit: BoxFit.cover,
@@ -145,7 +143,8 @@ class MyProfileState extends State<MyProfile> {
                                       weight: TextWeight.medium,
                                       color: AppColorConstants.whiteClr,
                                     ),
-                                    if (_profileController.user.value!.isVerified)
+                                    if (_profileController
+                                        .user.value!.isVerified)
                                       Row(
                                         children: [
                                           const SizedBox(
@@ -164,20 +163,19 @@ class MyProfileState extends State<MyProfile> {
                                   height: 20,
                                 ),
                                 if (_profileController
-                                    .user.value!.profileCategoryTypeId !=
+                                        .user.value!.profileCategoryTypeId !=
                                     0)
                                   BodyLargeText(
-                                      _profileController.user.value!
-                                          .profileCategoryTypeName,
-                                      weight: TextWeight.medium,
+                                    _profileController
+                                        .user.value!.profileCategoryTypeName,
+                                    weight: TextWeight.medium,
                                     color: AppColorConstants.whiteClr,
-                                  )
-                                      .bP4,
+                                  ).bP4,
                                 _profileController.user.value!.country != null
                                     ? BodyMediumText(
-                                  '${_profileController.user.value!.country}',
-                                  color: AppColorConstants.whiteClr,
-                                )
+                                        '${_profileController.user.value!.country}',
+                                        color: AppColorConstants.whiteClr,
+                                      )
                                     : Container(),
                                 AppThemeBorderButton(
                                     borderColor: AppColorConstants.whiteClr,
@@ -193,7 +191,6 @@ class MyProfileState extends State<MyProfile> {
                                         loadData();
                                       });
                                     }),
-
                                 const SizedBox(
                                   height: 20,
                                 ),
@@ -232,16 +229,13 @@ class MyProfileState extends State<MyProfile> {
                                           ),
                                         ],
                                       ).ripple(() {
-
                                         if (_profileController
                                                 .user.value!.totalFollower >
                                             0) {
                                           Get.to(() => FollowerFollowingList(
                                                     isFollowersList: true,
-                                                    userId:
-                                                    _profileController.user
-                                                        .value!
-                                                        .id,
+                                                    userId: _profileController
+                                                        .user.value!.id,
                                                   ))!
                                               .then((value) {
                                             loadData();
@@ -301,9 +295,7 @@ class MyProfileState extends State<MyProfile> {
             icon: ThemeIcon.notification,
             iconBtnClicked: () {
               // Get.to(() => const NotificationsScreen());
-            }
-            )
-    )
+            }))
         : Obx(() => titleNavigationBarWithIcon(
             context: context,
             title: _profileController.user.value?.userName ??
@@ -314,7 +306,7 @@ class MyProfileState extends State<MyProfile> {
             completion: () {
               Get.to(() => const NotificationsScreen());
             },
-        leading: (){}));
+            leading: () {}));
   }
 
   Widget segmentView() {
@@ -346,8 +338,8 @@ class MyProfileState extends State<MyProfile> {
                   highlights: _highlightsController.highlights,
                   addHighlightCallback: () {
                     Get.to(() => const ChooseStoryForHighlights(
-                      show: true,
-                    ));
+                          show: true,
+                        ));
                   },
                   viewHighlightCallback: (highlight) {
                     Get.to(() => HighlightViewer(highlight: highlight))!
@@ -385,7 +377,6 @@ class MyProfileState extends State<MyProfile> {
               ? _profileController.posts
               : _profileController.mentions;
 
-
           return _profileController.isLoadingPosts
               ? const PostBoxShimmer()
               : GridView.builder(
@@ -400,63 +391,60 @@ class MyProfileState extends State<MyProfile> {
                       mainAxisSpacing: 8.0,
                       mainAxisExtent: 100),
                   itemBuilder: (BuildContext context, int index) {
-                    print('------====>>${posts[index].gallery.first.thumbnail}');
-                   return Stack(
-                        children: [
-                          AspectRatio(
-                            aspectRatio: 1,
-                            child: CachedNetworkImage(
-                              imageUrl: posts[index].gallery.first
-                                  .isVideoPost == true
+                    print(
+                        '------====>>${posts[index].gallery.first.thumbnail}');
+                    return Stack(children: [
+                      AspectRatio(
+                        aspectRatio: 1,
+                        child: CachedNetworkImage(
+                          imageUrl:
+                              posts[index].gallery.first.isVideoPost == true
                                   ? posts[index].gallery.first.thumbnail
                                   : posts[index].gallery.first.filePath,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) =>
-                                  AppUtil.addProgressIndicator(size: 100),
-                              errorWidget: (context, url, error) =>
-                              const Icon(
-                                Icons.error,
-                              ),
-                            ).round(10),
-                          ).ripple(() {
-                            print('this is profile userid ${_userProfileManager
-                                .user}');
-                            Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder: (context, animation1,
-                                    animation2) =>
-                                    PostMediaFullScreen(post: posts[index]),
-                                transitionDuration: Duration.zero,
-                                reverseTransitionDuration: Duration.zero,
-                              ),
-                            );
-                            // Get.to(() => Posts(
-                            //     posts: List.from(posts),
-                            //     index: index,
-                            //     userId: _userProfileManager.user.value!.id,
-                            //     source: _profileController.selectedSegment.value == 0
-                            //         ? PostSource.posts
-                            //         : PostSource.mentions,
-                            //     page: _profileController.selectedSegment.value == 0
-                            //         ? _profileController.postsCurrentPage
-                            //         : _profileController.mentionsPostPage,
-                            //     totalPages: _profileController.totalPages));
-                          }),
-
-                          posts[index].gallery.length == 1
-                              ? posts[index].gallery.first.isVideoPost == true
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) =>
+                              AppUtil.addProgressIndicator(size: 100),
+                          errorWidget: (context, url, error) => const Icon(
+                            Icons.error,
+                          ),
+                        ).round(10),
+                      ).ripple(() {
+                        print(
+                            'this is profile userid ${_userProfileManager.user}');
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) =>
+                                PostMediaFullScreen(post: posts[index]),
+                            transitionDuration: Duration.zero,
+                            reverseTransitionDuration: Duration.zero,
+                          ),
+                        );
+                        // Get.to(() => Posts(
+                        //     posts: List.from(posts),
+                        //     index: index,
+                        //     userId: _userProfileManager.user.value!.id,
+                        //     source: _profileController.selectedSegment.value == 0
+                        //         ? PostSource.posts
+                        //         : PostSource.mentions,
+                        //     page: _profileController.selectedSegment.value == 0
+                        //         ? _profileController.postsCurrentPage
+                        //         : _profileController.mentionsPostPage,
+                        //     totalPages: _profileController.totalPages));
+                      }),
+                      posts[index].gallery.length == 1
+                          ? posts[index].gallery.first.isVideoPost == true
                               ? const Positioned(
-                            right: 5,
-                            top: 5,
-                            child: ThemeIconWidget(
-                              ThemeIcon.videoPost,
-                              size: 30,
-                              color: Colors.white,
-                            ),
-                          )
+                                  right: 5,
+                                  top: 5,
+                                  child: ThemeIconWidget(
+                                    ThemeIcon.videoPost,
+                                    size: 30,
+                                    color: Colors.white,
+                                  ),
+                                )
                               : Container()
-                              : const Positioned(
+                          : const Positioned(
                               right: 5,
                               top: 5,
                               child: ThemeIconWidget(
@@ -464,9 +452,8 @@ class MyProfileState extends State<MyProfile> {
                                 color: Colors.white,
                                 size: 30,
                               ))
-                        ]);
-                  }
-                ).hP16;
+                    ]);
+                  }).hP16;
         });
   }
 

@@ -164,7 +164,6 @@ class CameraPickerState extends State<CameraPicker>
 
     // TODO(Alex): Currently hide status bar will cause the viewport shaking on Android.
     /// Hide system status bar automatically when the platform is not Android.
-    /// 在非 Android 设备上自动隐藏状态栏
     if (!Platform.isAndroid) {
       SystemChrome.setEnabledSystemUIOverlays(<SystemUiOverlay>[]);
     }

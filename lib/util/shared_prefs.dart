@@ -50,8 +50,19 @@ class SharedPrefs {
 
   Future<String?> getAuthorizationKey() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-   print("this header ${ prefs.get('authKey')}");
+    print("this header ${prefs.get('authKey')}");
     return prefs.get('authKey') as String?;
+  }
+
+  Future setUploadTime(String uploadTime) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('uploadTime', uploadTime);
+  }
+
+  Future<String?> getUploadTime() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print("this header ${prefs.get('uploadTime')}");
+    return prefs.get('uploadTime') as String?;
   }
 
   void setFCMToken(String token) async {

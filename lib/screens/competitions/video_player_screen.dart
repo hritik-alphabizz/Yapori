@@ -292,6 +292,15 @@ class _PlayVideoControllerState extends State<PlayVideoController> {
 
     initializeVideoPlayerFuture = videoPlayerController!.initialize().then((_) {
       setState(() {});
+
+      videoPlayerController!.addListener(() {
+        if (videoPlayerController!.value.position ==
+            videoPlayerController!.value.duration) {
+          // Video completed, restart it
+          videoPlayerController!.seekTo(Duration.zero);
+          play();
+        }
+      });
       play();
     });
 
@@ -365,6 +374,8 @@ class _PlayVideoControllerState extends State<PlayVideoController> {
         videoPlayerController!.removeListener(checkVideoProgress);
 
         isPlayed = true;
+        videoPlayerController!.seekTo(const Duration(seconds: 0));
+        videoPlayerController!.play();
       });
     }
   }

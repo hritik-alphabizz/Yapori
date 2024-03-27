@@ -18,13 +18,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
-
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
   final LoginController controller = Get.find();
 
-  locationPermission()async{
+  locationPermission() async {
     await Permission.location.isDenied.then((value) {
       if (value) {
         Permission.location.request();
@@ -38,7 +37,7 @@ class LoginScreenState extends State<LoginScreen> {
     super.initState();
     // locationPermission();
     // getCurrentCountry();
-    Future.delayed(const Duration(seconds: 1), (){
+    Future.delayed(const Duration(seconds: 1), () {
       controller.determinePosition();
     });
 
@@ -59,7 +58,7 @@ class LoginScreenState extends State<LoginScreen> {
         desiredAccuracy: LocationAccuracy.best);
 
     List<Placemark> placemarks =
-    await placemarkFromCoordinates(position.latitude, position.longitude);
+        await placemarkFromCoordinates(position.latitude, position.longitude);
 
     if (placemarks.isNotEmpty) {
       countryName = placemarks[0].country;
@@ -97,7 +96,11 @@ class LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: MediaQuery.of(context).size.height * 0.01,
                     ),
-                    Image.asset('assets/applogo.jpeg', height: 120, width: 250,),
+                    Image.asset(
+                      'assets/applogo.jpeg',
+                      height: 120,
+                      width: 250,
+                    ),
 
                     SizedBox(
                       height: MediaQuery.of(context).size.height * 0.1,
@@ -165,7 +168,8 @@ class LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: MediaQuery.of(context).size.height * 0.04,
                     ),
-                    const SocialLogin(hidePhoneLogin: false).setPadding(left: 65, right: 65),
+                    const SocialLogin(hidePhoneLogin: false)
+                        .setPadding(left: 20, right: 20),
                     const Spacer(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

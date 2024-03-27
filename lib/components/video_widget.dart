@@ -123,7 +123,7 @@ class _VideoPostTileState extends State<VideoPostTile> {
                           showControls: false,
                           // Prepare the video to be played and display the first frame
                           autoInitialize: true,
-                          looping: false,
+                          looping: true,
                           autoPlay: false,
 
                           allowMuting: true,

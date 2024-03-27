@@ -69,8 +69,8 @@ class ClubsListingState extends State<ClubsListing> {
     });
     // _bannerAd?.dispose();
     _bannerAd = BannerAd(
-
-      adUnitId: _settingsController.setting.value!.interstitialAdUnitIdForAndroid!,
+      adUnitId:
+          _settingsController.setting.value!.interstitialAdUnitIdForAndroid!,
       //'ca-app-pub-3940256099942544/6300978111',
       request: const AdRequest(),
       size: AdSize.banner,
@@ -112,13 +112,13 @@ class ClubsListingState extends State<ClubsListing> {
         height: 50,
         width: 50,
         color: AppColorConstants.themeColor.withOpacity(0.7),
-        child:  ThemeIconWidget(
+        child: ThemeIconWidget(
           ThemeIcon.plus,
           color: AppColorConstants.whiteClr,
           size: 25,
         ),
       ).circular.ripple(() {
-        Get.to(() =>  CategoriesList(clubsController: _clubsController));
+        Get.to(() => CategoriesList(clubsController: _clubsController));
       }),
       // appBar: AppBar(
       //   elevation: 0,
@@ -159,22 +159,26 @@ class ClubsListingState extends State<ClubsListing> {
               List<ClubInvitation> invitations = _clubsController.invitations;
               return _clubsController.segmentIndex.value == 3
                   ? clubsInvitationsListingWidget(invitations)
-                  : clubsListingWidget(clubs);
+                  : clubs.length == 0
+                      ? Container()
+                      : clubsListingWidget(clubs);
             }),
           ),
         ],
       ),
     );
   }
-  Widget bannerAd(){
+
+  Widget bannerAd() {
     return _bannerReady
         ? SizedBox(
-      width: _bannerAd!.size.width.toDouble(),
-      height: _bannerAd!.size.height.toDouble(),
-      child: AdWidget(ad: _bannerAd!),
-    )
+            width: _bannerAd!.size.width.toDouble(),
+            height: _bannerAd!.size.height.toDouble(),
+            child: AdWidget(ad: _bannerAd!),
+          )
         : Container();
   }
+
   Widget categories() {
     return SizedBox(
       height: 100,
@@ -245,10 +249,9 @@ class ClubsListingState extends State<ClubsListing> {
                       _clubsController.leaveClub(clubs[index]);
                     },
                     previewBtnClicked: () {
-                      if(clubs[index].privacyType == 3) {
+                      if (clubs[index].privacyType == 3) {
                         if (clubs[index].isJoined == true) {
-                          Get.to(() =>
-                              ClubDetail(
+                          Get.to(() => ClubDetail(
                                 club: clubs[index],
                                 needRefreshCallback: () {
                                   _clubsController.getClubs(isStartOver: false);
@@ -261,9 +264,8 @@ class ClubsListingState extends State<ClubsListing> {
                                 },
                               ));
                         }
-                      }else{
-                        Get.to(() =>
-                            ClubDetail(
+                      } else {
+                        Get.to(() => ClubDetail(
                               club: clubs[index],
                               needRefreshCallback: () {
                                 _clubsController.getClubs(isStartOver: false);
